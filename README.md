@@ -1,1 +1,1 @@
-# CS347---Data-Management
+# CS347 - Data-Management
