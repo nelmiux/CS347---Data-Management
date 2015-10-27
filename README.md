@@ -2,9 +2,9 @@
 
 The code given implements the translation from SQL to SPARQL without subqueries fruntionability.
 
-## What we implemented?
+## What we are going to implement?
 
-- Subquery functionability translation from SQL to SPARQL
+- Subquery capability translation from SQL to SPARQL
 
 ## Setting the enviroment and using the Application over Linux Terminal
 
