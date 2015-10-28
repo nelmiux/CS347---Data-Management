@@ -96,6 +96,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 
     private List<String> filters;
 	private List<String> matches;
+    private List<String> subselects;
 	private HashMap<String, String> tablesAliases;
 	private HashMap<String, String> tables2alias;
 	private LinkedHashMap<String, String> columnsAs;
@@ -395,6 +396,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		// Initialize Validator
 		SQLValidator validator = new SQLValidator();
 	    String SPARQL = "";
+        subselect = false;
 	    this.connectionType = getConnectionType;
 		
 		if (connection.getDebug() == "debug") System.out.println("SQL statement: |" + select + "|");	
@@ -443,7 +445,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 
 		List<String> joinColumns = new ArrayList<String>();
 
-		tempSub = visitSelect_buildSPARQL(plainSelect, filters, tables, orderby, groupby, having, tablesAliases, tables2alias, columnsAs, aggrColumnsAs, joinColumns);
+		tempSub = visitSelect_buildSPARQL(plainSelect, subselects, filters, tables, orderby, groupby, having, tablesAliases, tables2alias, columnsAs, aggrColumnsAs, joinColumns);
 
 		subq.add(tempSub);
 	}
@@ -508,7 +510,8 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 	 * Build the SPARQL for a SELECT statement.
 	 */
 	public String visitSelect_buildSPARQL(
-	               PlainSelect plainSelect, 
+	               PlainSelect plainSelect,
+                   List<String> subselects, 
 				   List<String> filters,
 				   List<String> tables,
 				   List<String> orderby,
@@ -788,6 +791,22 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		                	}
 		                }
 					}
+                    String x = "select";
+                    if ((c.indexOf(x) >= 0) || (c.indexOf(x.toUpperCase()) >= 0)) {
+                        String ss = "";
+                        String nn = "";
+                        if (c.indexOf("IN") >= 0) {
+                            ss = c.substring(c.indexOf("IN") + 3, c.lastIndexOf(")") + 1);
+                            nn = c.substring(0, c.indexOf("IN") - 1);
+                        }
+                        else if (c.indexOf("in") >= 0) {
+                            ss = c.substring(c.indexOf("in") + 3, c.lastIndexOf(")") + 1);
+                            nn = c.substring(0, c.indexOf("in") - 1);
+                        }   
+                        System.out.println("This is my test: " + ss);
+                        subselects.add(ss);
+                        filter += ":" + nn + " IN ()";
+                    }
 				}
 				filters.add(fColumns + filter.replace("'", "") + ") ");
 		}
@@ -893,6 +912,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		if (connection.getDebug() == "debug") {
 			System.out.println("\nvisitSelect_buildSPARQL Structures necessary to build the SPARQL statement:");
 			System.out.println("\t - plainSelect: " + plainSelect);
+            System.out.println("\t - subSelect: " + subselects);
 			System.out.println("\t - RDFTableNames: " + RDFTableNames);
 			System.out.println("\t - tables: " + tables);
 			System.out.println("\t - tablesAliases: " + tablesAliases);
@@ -1338,9 +1358,12 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 	@Override
 	public void visit(SubSelect subSelect) {	
 		sq.push(true);
+        subselect = true;
+        //subDepth++;
 		subSelect.getSelectBody().accept(this);
-		
 		temp = temp.substring(0, temp.indexOf("IN") + 2);
+        //PlainSelect subS = (PlainSelect)subSelect.getSelectBody();
+        //visit(subS);
 	}
 	
 	/**
