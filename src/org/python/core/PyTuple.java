@@ -58,7 +58,8 @@ public class PyTuple extends PySequenceList implements List {
     private ArrayList<PyType> relQueryInstancesType = new ArrayList<PyType>();
     private Collection<String> relQueryInstancesTypeNames = new ArrayList<String>(); 
 
-    
+    private static SQLVisitor v;
+    private Boolean flag = false;
     // private final PyObject[] array;
     private PyObject[] array;           // Changed for ReL
 
@@ -257,6 +258,10 @@ public class PyTuple extends PySequenceList implements List {
     }
     
     public void doRDF(net.sf.jsqlparser.statement.Statement statement, PyRelConnection conn) {
+        if (!flag) {
+        	v = new SQLVisitor(conn);
+        	flag = true;
+        }
         if (statement instanceof CreateTable) {
     	   try {
     	      net.sf.jsqlparser.statement.create.table.CreateTable caststmt =
@@ -283,18 +288,36 @@ public class PyTuple extends PySequenceList implements List {
     	      //temp[0] = new PyString(e.toString());
     	      //rows.add(new PyTuple(temp));
     	   }
+    	} else if (statement instanceof SubSelect){
+    	   try {
+    	      net.sf.jsqlparser.statement.select.SubSelect caststmt = (net.sf.jsqlparser.statement.select.SubSelect)statement;
+			  String rdf; 
+			  if (this.relQueryInstancesTypeNames.size() > 0)
+              {
+                  rdf = v.getSelect(caststmt, relQueryInstancesTypeNames, conn.getConnectionType());
+              }
+              else {
+                  rdf = v.getSelect(caststmt, null, conn.getConnectionType());
+              }
+    	   	  runAndOutputTuples(conn, rdf);
+    	   } catch (Exception e) {
+    	      System.out.println(e);
+    	      e.printStackTrace();
+    	      //PyObject[] temp = new PyObject[1];
+    	      //temp[0] = new PyString(e.toString());
+    	      //rows.add(new PyTuple(temp));
+    	   }
     	} else if (statement instanceof Select) {
     	   try {
 
     	      net.sf.jsqlparser.statement.select.Select caststmt = (net.sf.jsqlparser.statement.select.Select)statement;
-    	      SQLVisitor visitor = new SQLVisitor(conn);
               String rdf; 
               if (this.relQueryInstancesTypeNames.size() > 0)
               {
-                  rdf = visitor.getSelect(caststmt, relQueryInstancesTypeNames, conn.getConnectionType());
+                  rdf = v.getSelect(caststmt, relQueryInstancesTypeNames, conn.getConnectionType());
               }
               else {
-                  rdf = visitor.getSelect(caststmt, null, conn.getConnectionType());
+                  rdf = v.getSelect(caststmt, null, conn.getConnectionType());
               }
               // String rdf = "";
               // an oo query forces the session to be committed first. 
@@ -306,7 +329,7 @@ public class PyTuple extends PySequenceList implements List {
     	      //PyObject[] temp = new PyObject[1];
     	      //temp[0] = new PyString(e.toString());
     	      //rows.add(new PyTuple(temp));
-    	   }
+    	   } 
     	} else if (statement instanceof Delete)
 		{
 			net.sf.jsqlparser.statement.delete.Delete caststmt = (net.sf.jsqlparser.statement.delete.Delete) statement;
