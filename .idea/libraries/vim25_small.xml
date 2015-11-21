@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="vim25-small">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/tests/java/org/python/core/packagecache/vim25-small.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
