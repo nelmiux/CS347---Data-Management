@@ -1,0 +1,4 @@
+cd /Users/pcannata/Mine/MyReL/dist/Lib/site-packages/werkzeug/werkzeug/
+vi exceptions.py
+remove line 71 (or what ever line is causing the problem)
+sudo pip install --target=/Users/pcannata/Mine/MyReL/dist/Lib/site-packages Flask

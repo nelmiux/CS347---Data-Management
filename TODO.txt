@@ -1,0 +1,7 @@
+- Fix uppercasing in SIM
+
+- complete implementation of SIM Modify
+
+- SIM WHERE clause can only do =
+
+- Fix not all SCHEMA information being unique

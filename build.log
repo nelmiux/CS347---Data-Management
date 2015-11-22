@@ -1,0 +1,390 @@
+Buildfile: /v/filer4b/v38q001/davidio/Documents/relproject2.0/build.xml
+
+full-preinit:
+
+init:
+
+dump-env:
+     [echo] .
+     [echo] Build environment for jython
+     [echo] (Note: if ${propertyname} is displayed, then the property is not set)
+     [echo] --- optional libraries ---
+     [echo] --- properties ---
+     [echo] work.dir           = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work'
+     [echo] jython.base.dir    = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython'
+     [echo] source.dir         = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src'
+     [echo] output.dir         = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build'
+     [echo] compile.dir        = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes'
+     [echo] exposed.dir        = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/exposed'
+     [echo] dist.dir           = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist'
+     [echo] apidoc.dir         = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/Doc/javadoc'
+     [echo] templates.dir      = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/templates'
+     [echo] templates.lazy     = 'true'
+     [echo] python.lib         = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/lib-python/2.7'
+     [echo] build.compiler     = 'modern'
+     [echo] jython.use.invokedynamic = '${jython.use.invokedynamic}'
+     [echo] jdk.target.version = '1.6'
+     [echo] jdk.source.version = '1.6'
+     [echo] deprecation        = 'true'
+     [echo] debug              = 'true'
+     [echo] nowarn             = 'true'
+     [echo] --- properties (used for full-build only) ---
+     [echo] checkout.dir   = '/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout'
+     [echo] javahl.dir         = '${javahl.dir}'
+     [echo] do.snapshot.build  = '${do.snapshot.build}'
+     [echo] snapshot.revision  = '${snapshot.revision}'
+     [echo] do.checkout        = 'false'
+
+full-check:
+
+clean-checkout-dir:
+
+clean:
+
+prepare-full:
+    [mkdir] Created dir: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/Doc
+    [mkdir] Created dir: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/Doc/javadoc
+
+prepare-checkout:
+
+needed-check:
+
+clean-if-antlr-needed:
+
+init:
+
+clean-checkout-dir:
+
+clean:
+
+prepare-output:
+    [mkdir] Created dir: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes
+    [mkdir] Created dir: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/gensrc/org/python/antlr
+    [mkdir] Created dir: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/exposed
+
+prepare:
+
+checkout:
+
+brand-readme-version:
+
+installer-init:
+
+antlr_gen:
+     [java] warning(105): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1316:15: no lexer rule corresponding to token: INDENT
+     [java] warning(105): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1323:10: no lexer rule corresponding to token: DEDENT
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1502:11: Decision can match input such as "VBAR" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1501:9: Decision can match input such as "VBAR" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1524:11: Decision can match input such as "CIRCUMFLEX" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1523:9: Decision can match input such as "CIRCUMFLEX" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1545:11: Decision can match input such as "AMPER" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1544:9: Decision can match input such as "AMPER" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1574:11: Decision can match input such as "RIGHTSHIFT" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1574:11: Decision can match input such as "LEFTSHIFT" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1569:9: Decision can match input such as "RIGHTSHIFT" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1569:9: Decision can match input such as "LEFTSHIFT" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1615:11: Decision can match input such as "MINUS" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1615:11: Decision can match input such as "PLUS" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1610:9: Decision can match input such as "MINUS" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1610:9: Decision can match input such as "PLUS" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1666:11: Decision can match input such as "DOUBLESLASH" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1666:11: Decision can match input such as "PERCENT" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1666:11: Decision can match input such as "STAR" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1666:11: Decision can match input such as "SLASH" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1661:9: Decision can match input such as "DOUBLESLASH" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1661:9: Decision can match input such as "PERCENT" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1661:9: Decision can match input such as "STAR" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1661:9: Decision can match input such as "SLASH" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1723:48: Decision can match input such as "LPAREN" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1723:48: Decision can match input such as "DOT" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1723:48: Decision can match input such as "LBRACK" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1723:51: Decision can match input such as "DOUBLESTAR" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1828:18: Decision can match input such as "STRING" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1879:26: Decision can match input such as "LPAREN" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1879:26: Decision can match input such as "{STRING, OORELCOMMIT..BATCHES}" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1879:26: Decision can match input such as "MINUS" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1879:26: Decision can match input such as "PLUS" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1879:26: Decision can match input such as "LBRACK" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1879:26: Decision can match input such as "BACKQUOTE" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1883:13: Decision can match input such as "STRING" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1895:30: Decision can match input such as "LPAREN" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1895:30: Decision can match input such as "{STRING, OORELCOMMIT..BATCHES}" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1895:30: Decision can match input such as "MINUS" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1895:30: Decision can match input such as "PLUS" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1895:30: Decision can match input such as "LBRACK" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1895:30: Decision can match input such as "BACKQUOTE" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:1903:17: Decision can match input such as "STRING" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:2107:59: Decision can match input such as "COMMA BACKQUOTE" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:2107:62: Decision can match input such as "COMMA" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:2523:7: Decision can match input such as "'"'" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:2529:7: Decision can match input such as "'\''" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/Python.g:2542:37: Decision can match input such as "{'\t', ' '}" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+     [java] warning(105): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:690:7: no lexer rule corresponding to token: TRAILBACKSLASH
+     [java] warning(105): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:550:17: no lexer rule corresponding to token: INDENT
+     [java] warning(105): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:550:33: no lexer rule corresponding to token: DEDENT
+     [java] warning(105): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:549:18: no lexer rule corresponding to token: DEDENT
+     [java] warning(105): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:728:19: no lexer rule corresponding to token: TRAILBACKSLASH
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:175:27: Decision can match input such as "NEWLINE" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:238:7: Decision can match input such as "AT" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:803:39: Decision can match input such as "COMMA BACKQUOTE" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:803:42: Decision can match input such as "COMMA" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:1062:38: Decision can match input such as "'\\''\n'{'\t', ' '}'#''\\''\r''\n'" using multiple alternatives: 1, 3
+     [java] As a result, alternative(s) 3 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:1062:38: Decision can match input such as "'\\''\n'{'\t', ' '}'#''\\''\n'" using multiple alternatives: 1, 3
+     [java] As a result, alternative(s) 3 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:1063:40: Decision can match input such as "'\\''\n'{'\t', ' '}'#''\\''\n'" using multiple alternatives: 1, 3
+     [java] As a result, alternative(s) 3 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:1063:40: Decision can match input such as "'\\''\n'{'\t', ' '}'#''\\''\r''\n'" using multiple alternatives: 1, 3
+     [java] As a result, alternative(s) 3 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:1071:7: Decision can match input such as "'"'" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:1077:7: Decision can match input such as "'\''" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] warning(200): /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/grammar/PythonPartial.g:1093:37: Decision can match input such as "{'\t', ' '}" using multiple alternatives: 1, 2
+     [java] As a result, alternative(s) 2 were disabled for that input
+     [java] Semantic predicates were present but were hidden by actions.
+
+check-hg:
+
+hg-branch:
+
+hg-tag:
+
+hg-version:
+
+hg-id:
+
+brand-version:
+    [mkdir] Created dir: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes/org/python
+
+compile:
+    [javac] /v/filer4b/v38q001/davidio/Documents/relproject2.0/build.xml:472: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 847 source files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes
+    [javac] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/modules/_collections/PyDefaultDict.java:56: warning: [deprecation] <K,V>makeComputingMap(Function<? super K,? extends V>) in MapMaker has been deprecated
+    [javac]                 new MapMaker().makeComputingMap(
+    [javac]                               ^
+    [javac]   where K,V are type-variables:
+    [javac]     K extends Object declared in method <K,V>makeComputingMap(Function<? super K,? extends V>)
+    [javac]     V extends Object declared in method <K,V>makeComputingMap(Function<? super K,? extends V>)
+    [javac] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/modules/jffi/StructLayout.java:125: warning: [deprecation] Struct(Type...) in Struct has been deprecated
+    [javac]                     : new com.kenai.jffi.Struct(fieldTypes);
+    [javac]                       ^
+    [javac] Note: Some input files use unchecked or unsafe operations.
+    [javac] Note: Recompile with -Xlint:unchecked for details.
+    [javac] 2 warnings
+    [javac] /v/filer4b/v38q001/davidio/Documents/relproject2.0/build.xml:490: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] /v/filer4b/v38q001/davidio/Documents/relproject2.0/build.xml:502: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 110 source files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes
+    [javac] Note: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/tests/java/javatests/DiamondIterableMapMRO.java uses unchecked or unsafe operations.
+    [javac] Note: Recompile with -Xlint:unchecked for details.
+    [javac] /v/filer4b/v38q001/davidio/Documents/relproject2.0/build.xml:512: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+     [copy] Copying 1 file to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes/org/python/modules
+     [copy] Copying 2 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes
+     [copy] Copying 1 file to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes/META-INF/services
+
+expose:
+   [expose] Exposing 213 classes
+
+jar:
+      [jar] Building jar: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/callbacker_test.jar
+      [jar] Building jar: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/jython-dev.jar
+
+jar-complete:
+   [jarjar] Building jar: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/jython.jar
+
+copy-javalib:
+
+copy-cpythonlib:
+     [copy] Copying 1033 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/Lib
+
+copy-lib:
+     [copy] Copying 479 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/Lib
+     [copy] Copying 2 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/bin
+     [copy] Copying 1 file to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+
+jar-standalone:
+
+javadoc:
+  [javadoc] Generating Javadoc
+  [javadoc] Javadoc execution
+  [javadoc] Creating destination directory: "/v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/Doc/javadoc/"
+  [javadoc] warning: [options] bootstrap class path not set in conjunction with -source 1.6
+  [javadoc] Loading source files for package com.xhaus.modjy...
+  [javadoc] Loading source files for package com.ziclix.python.sql...
+  [javadoc] Loading source files for package org.python.core...
+  [javadoc] Loading source files for package org.python.core.adapter...
+  [javadoc] Loading source files for package org.python.core.buffer...
+  [javadoc] Loading source files for package org.python.core.io...
+  [javadoc] Loading source files for package org.python.core.packagecache...
+  [javadoc] Loading source files for package org.python.core.stringlib...
+  [javadoc] Loading source files for package org.python.core.util...
+  [javadoc] Loading source files for package org.python.modules...
+  [javadoc] Loading source files for package org.python.modules._collections...
+  [javadoc] Loading source files for package org.python.modules._csv...
+  [javadoc] Loading source files for package org.python.modules._functools...
+  [javadoc] Loading source files for package org.python.modules._io...
+  [javadoc] Loading source files for package org.python.modules._threading...
+  [javadoc] Loading source files for package org.python.modules._weakref...
+  [javadoc] Loading source files for package org.python.modules.bz2...
+  [javadoc] Loading source files for package org.python.modules.itertools...
+  [javadoc] Loading source files for package org.python.modules.jffi...
+  [javadoc] Loading source files for package org.python.modules.posix...
+  [javadoc] Loading source files for package org.python.modules.random...
+  [javadoc] Loading source files for package org.python.modules.sre...
+  [javadoc] Loading source files for package org.python.modules.thread...
+  [javadoc] Loading source files for package org.python.modules.time...
+  [javadoc] Loading source files for package org.python.modules.zipimport...
+  [javadoc] Loading source files for package org.python.util...
+  [javadoc] Constructing Javadoc information...
+  [javadoc] Standard Doclet version 1.7.0_40
+  [javadoc] Building tree for all the packages and classes...
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/BaseBytes.java:237: warning - Tag @see: can't find bytearray___init__(PyObject[], String[]) in org.python.core.BaseBytes
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/BaseBytes.java:253: warning - Tag @see: can't find bytearray___init__(PyObject[], String[]) in org.python.core.BaseBytes
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/BaseBytes.java:274: warning - Tag @see: can't find ByteArray(PyString, String, String) in org.python.core.BaseBytes
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/BaseBytes.java:1196: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/BaseBytes.java:2972: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/codecs.java:493: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/Py.java:1459: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SIMHelper.java:35: warning - @param argument "connection" is not a parameter name.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:130: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:244: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:256: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:271: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:300: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:399: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:444: warning - @return tag has no arguments.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:25: warning - @param argument "modelName" is not a parameter name.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:85: warning - @param argument "property" is not a parameter name.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:119: warning - @param argument "connection.getGraph()Name" is not a parameter name.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:271: warning - @param argument "userName" is not a parameter name.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:300: warning - @param argument "evaName" is not a parameter name.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:300: warning - @return tag cannot be used in method with void return type.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:528: warning - @param argument "subject" is not a parameter name.
+  [javadoc] /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/src/org/python/core/SPARQLDoer.java:528: warning - @param argument "property" is not a parameter name.
+  [javadoc] Building index for all the packages and classes...
+  [javadoc] Building index for all classes...
+  [javadoc] Generating /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/Doc/javadoc/help-doc.html...
+  [javadoc] 24 warnings
+
+copy-license:
+     [echo] copy CPython LICENSE from /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/python
+     [copy] Copying 1 file to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+
+copy-full:
+     [echo] copy misc files from /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython
+     [copy] Copying 6 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+     [echo] copy sources from /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython
+     [copy] Copying 1179 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+     [echo] copy the demo files from /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/Demo
+     [copy] Copying 37 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/Demo
+
+installer:
+     [echo] compiling installer from /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/checkout/jython/installer/src/java
+    [javac] /v/filer4b/v38q001/davidio/Documents/relproject2.0/build.xml:825: warning: 'includeantruntime' was not set, defaulting to build.sysclasspath=last; set to false for repeatable builds
+    [javac] Compiling 77 source files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/build/classes
+    [javac] Note: Some input files use unchecked or unsafe operations.
+    [javac] Note: Recompile with -Xlint:unchecked for details.
+     [echo] copy installer classes to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+     [copy] Copying 108 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+     [copy] Copying 1 file to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+     [echo] copy installer icon to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+     [copy] Copying 3 files to /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist
+     [echo] building installer .jar file
+      [jar] Building jar: /v/filer4b/v38q001/davidio/Documents/relproject2.0/work/dist/jython-installer.jar
+
+full-build:
+
+BUILD SUCCESSFUL
+Total time: 1 minute 40 seconds
