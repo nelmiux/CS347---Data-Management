@@ -84,35 +84,44 @@ import com.hp.hpl.jena.vocabulary.RDF;
 import com.hp.hpl.jena.vocabulary.RDFS;
 
 public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromItemVisitor, ExpressionVisitor, ItemsListVisitor, SelectItemVisitor, OrderByVisitor {
-	
-    //Variables needed to connect to AllegroGraph Database. Set to appropriate values.
-    //private static String PREFIX = "http://example.org/people/";
-    private static String PREFIX = "http://example.org/people.owl#";
-    private static String SERVER_URL = "http://172.16.18.134:10035";
-    private static String CATALOG_ID = "java-catalog";
-    private static String REPOSITORY_ID = "jenatutorial";
-    private static String USERNAME = "test";
-    private static String PASSWORD = "xyzzy";
 
-    private List<String> filters;
+	//Variables needed to connect to AllegroGraph Database. Set to appropriate values.
+	//private static String PREFIX = "http://example.org/people/";
+	private static String PREFIX = "http://example.org/people.owl#";
+	private static String SERVER_URL = "http://172.16.18.134:10035";
+	private static String CATALOG_ID = "java-catalog";
+	private static String REPOSITORY_ID = "jenatutorial";
+	private static String USERNAME = "test";
+	private static String PASSWORD = "xyzzy";
+
+	private List<String> filters;
 	private List<String> matches;
-    private List<String> subselects = new ArrayList<String>();
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+    private List<String> subselects;
+>>>>>>> parent of c37b007... Some Changes
+=======
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
 	private HashMap<String, String> tablesAliases;
 	private HashMap<String, String> tables2alias;
 	private LinkedHashMap<String, String> columnsAs;
 	private LinkedHashMap<String, String> aggrColumnsAs;
 	private List<String> joinColumns;
+	private List<String> subselects = new ArrayList<String>();
 	private static String temp;
 	private String ownException;
 	private Boolean wasEquals;
-	private Boolean subselect = false;
+	private Boolean subselect;
 	private int subDepth;
+	private List<String> tab = new ArrayList<String>();
+	private LinkedHashMap<String,String> columnsas = new LinkedHashMap<String,String>();
 	private static int joinInc = 1; // for each join this will be incremented and used in a variable name.
-	
+
 	HashMap<String, String> colVarNames = new HashMap<String, String>();
-	ArrayList<String> allCols = new ArrayList<String>(); 
+	ArrayList<String> allCols = new ArrayList<String>();
 	private static String[] aggregates = {"avg", "count", "max", "min", "sum"}; // Input as lower case.
-    private static String[] inequalities = {" = ", " > ", " < ", " >= ", " <= ", " != "};
+	private static String[] inequalities = {" = ", " > ", " < ", " >= ", " <= ", " != "};
 	ArrayList<String> plainAliases = new ArrayList<String>();
 
 	private String tablenameFrom = "";
@@ -124,17 +133,16 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 	public Statement stmt;
 
 	public CCJSqlParserManager parserManager = new CCJSqlParserManager();
-	
+
 	static private HashMap<String, String> map  = new HashMap<String, String>();
-	
+
 	/**
 	 *
 	 */
 	public SQLVisitor(PyObject conn) {
 		this.connection = (PyRelConnection)conn;
-
 	}
-	
+
 	/**
 	 *
 	 */
@@ -181,7 +189,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 */
 	}
 
-    /* 
+	/*
      * Convenience method called by doInsert(). This method takes 2 arguments: 1) a string containing
      * the table name to insert triples into 2) an ArrayList of HashMap of 3 key-value pairs - key "attr" maps to
      * attribute  value (E.g. "name"), key "valStr" maps to the actual value of the attribute (E.g.
@@ -195,27 +203,27 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
      * the triples into the DB. Perhaps the inserting of the triples should be delegated to the appropriate methods
      * in SPARQLDoer.java?
      */
-    public void AGInsert(String tableName, ArrayList<HashMap<String, String>> attrVals) {
-    	try {
+	public void AGInsert(String tableName, ArrayList<HashMap<String, String>> attrVals) {
+		try {
 			// Boiler plate code to establish connection to AG repository.
-            AGServer server = new AGServer(SERVER_URL, USERNAME, PASSWORD);
-       		AGCatalog catalog = server.getCatalog(CATALOG_ID);
-        	AGRepository myRepository = catalog.openRepository(REPOSITORY_ID);
-        	AGRepositoryConnection conn = myRepository.getConnection();
+			AGServer server = new AGServer(SERVER_URL, USERNAME, PASSWORD);
+			AGCatalog catalog = server.getCatalog(CATALOG_ID);
+			AGRepository myRepository = catalog.openRepository(REPOSITORY_ID);
+			AGRepositoryConnection conn = myRepository.getConnection();
 
-        	// Boiler plate code to create variable of type AGModel for inserts
-            AGGraphMaker maker = new AGGraphMaker(conn);
-            // Graph should be "http://www.example.org/people.owl" instead of default-graph?
-        	AGGraph graph = maker.getGraph();
-        	AGModel model = new AGModel(graph);
-        	
-	    	for (HashMap<String, String> attrVal : attrVals) {
-                //Create some resources and literals to make statements from
-                String idString = AnonId.create().toString();
-	    	    Resource id = model.createResource(PREFIX + idString); //id for triples
-			    Property attr = model.createProperty(PREFIX + attrVal.get("attr"));
-			    Resource table = model.createResource(PREFIX + tableName);
-                Property dbUniqueID = model.createProperty(PREFIX + "DBUNIQUEID");
+			// Boiler plate code to create variable of type AGModel for inserts
+			AGGraphMaker maker = new AGGraphMaker(conn);
+			// Graph should be "http://www.example.org/people.owl" instead of default-graph?
+			AGGraph graph = maker.getGraph();
+			AGModel model = new AGModel(graph);
+
+			for (HashMap<String, String> attrVal : attrVals) {
+				//Create some resources and literals to make statements from
+				String idString = AnonId.create().toString();
+				Resource id = model.createResource(PREFIX + idString); //id for triples
+				Property attr = model.createProperty(PREFIX + attrVal.get("attr"));
+				Resource table = model.createResource(PREFIX + tableName);
+				Property dbUniqueID = model.createProperty(PREFIX + "DBUNIQUEID");
 
 			    /*
                  * Need switch statement here to determine the type of literal to create.
@@ -223,11 +231,11 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                  * To find out type of literal to create, attrVal.get("type") returns a variable (of type string)
                  * that represents the value type of attribute (string, integer, etc...)
                  */
-                Literal valStr = model.createTypedLiteral(attrVal.get("valStr"), XSDDatatype.XSDstring); 
+				Literal valStr = model.createTypedLiteral(attrVal.get("valStr"), XSDDatatype.XSDstring);
 
-                // Need to make literal for ID. Usually, ID would be an integer, but AnonID.create()
-                // returns a value consisting of alpha numeric characters.
-                Literal idLiteral = model.createTypedLiteral(idString, XSDDatatype.XSDstring);
+				// Need to make literal for ID. Usually, ID would be an integer, but AnonID.create()
+				// returns a value consisting of alpha numeric characters.
+				Literal idLiteral = model.createTypedLiteral(idString, XSDDatatype.XSDstring);
                        
 			    /*
                  * Inserting 11 triples per SQL relational insert statement.
@@ -235,9 +243,9 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                  * The last 6 triples refer to metadata needed? internally by ReL
                  * When connecting to AG.
                  */
-                model.add(id, attr, valStr);
-			    model.add(attr, RDF.type, OWL.DatatypeProperty);
-                model.add(attr, RDFS.domain, table);
+				model.add(id, attr, valStr);
+				model.add(attr, RDF.type, OWL.DatatypeProperty);
+				model.add(attr, RDFS.domain, table);
                 /* 
                  * According to com.hp.hpl.jena.vocabulary, RDF does not have field type range, only RDFS does. Is this
                  * appropriate?
@@ -245,161 +253,175 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                  * sure whether this datatype is internal only to ReL? For now, string literal of "rdfs:xsd:string" 
                  * is used for object value of triple.
                  */
-                model.add(attr, RDFS.range, "rdfs:xsd:string");
-                model.add(attr, RDF.type, OWL.FunctionalProperty);
+				model.add(attr, RDFS.range, "rdfs:xsd:string");
+				model.add(attr, RDF.type, OWL.FunctionalProperty);
 
-                model.add(id, dbUniqueID, idLiteral);
-                model.add(dbUniqueID, RDF.type, OWL.DatatypeProperty);
-                model.add(dbUniqueID, RDFS.domain, table);
-                // Same problem as a few lines above.
-                model.add(dbUniqueID, RDFS.range, "rdfs:xsd:integer");
-                model.add(dbUniqueID, RDF.type, OWL.FunctionalProperty);
-                model.add(id, RDF.type, table);
-            }
+				model.add(id, dbUniqueID, idLiteral);
+				model.add(dbUniqueID, RDF.type, OWL.DatatypeProperty);
+				model.add(dbUniqueID, RDFS.domain, table);
+				// Same problem as a few lines above.
+				model.add(dbUniqueID, RDFS.range, "rdfs:xsd:integer");
+				model.add(dbUniqueID, RDF.type, OWL.FunctionalProperty);
+				model.add(id, RDF.type, table);
+			}
 
-           	// Closing model, connection, and repository
-            model.close();
-           	graph.close();
-           	maker.close();
-       		conn.close();
-       		myRepository.shutDown();
+			// Closing model, connection, and repository
+			model.close();
+			graph.close();
+			maker.close();
+			conn.close();
+			myRepository.shutDown();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.exit(-1);
 		}
-    }
+	}
 
-    /**
-     * 
-     */
-    //public void doInsert(Insert stmt) throws SQLException { // Old method signature
-    public void doInsert(Insert stmt, String getConnectionType) throws SQLException {//New method signature
-        if (stmt.getColumns() != null) {
-        	this.connectionType = getConnectionType;
-
-            // Inserting into Oracle RDF
-        	if (connectionType == "rdf_mode") {
-            	Iterator valsIt = ((ExpressionList)stmt.getItemsList()).getExpressions().iterator();
-            	String id = Integer.toString(SPARQLDoer.getNextGUID(connection));
-            	String subject = id;
-            	String attvalPairs = "DBUNIQUEID" + " := " + id + " ";
-
-            	for (Iterator colsIt = stmt.getColumns().iterator(); colsIt.hasNext(); ) {
-                	String attr = ((Column)colsIt.next()).getColumnName().replaceAll("'", "").replaceAll("\"", "");
-                	Object attrValue = valsIt.next(); 
-                	String valStr = (attrValue.toString().replaceAll("'", "")).replaceAll("\'", "").replaceAll("\"", "");
-                	attvalPairs += attr + " := " + valStr + " ";
-            	}
-                	
-				ProcessLanguages processLanguage = new ProcessLanguages(connection);
-				processLanguage.processSIM("INSERT " + stmt.getTable().toString() + " " + attvalPairs);
-        	
-        	// Inserting into AllegroGraph
-            } else if (connectionType == "ag_sql_rdf_mode") {
-
-      			String tableName = null;
-      			ArrayList<HashMap<String, String>> attrVals = new ArrayList<HashMap<String, String>>();
-
-        		Iterator valsIt = ((ExpressionList)stmt.getItemsList()).getExpressions().iterator();
-        		for (Iterator colsIt = stmt.getColumns().iterator(); colsIt.hasNext(); ) {
-                	String attr = ((Column)colsIt.next()).getColumnName().replaceAll("'", "").replaceAll("\"", "");
-                	Object attrValue = valsIt.next(); 
-                	String valStr = (attrValue.toString().replaceAll("'", "")).replaceAll("\'", "").replaceAll("\"", "");
-                	// Determine a type string for our object being inserted.
-                	String typeString = null;
-                	if (attrValue instanceof LongValue)
-                	{
-                    	typeString = "integer";
-                	}
-                	else if(attrValue instanceof DoubleValue)
-                	{
-                        typeString = "float";
-                	}
-                	else
-                	{
-                    	if(valStr.toUpperCase().equals("TRUE") || valStr.toUpperCase().equals("FALSE"))
-                    	{
-                        	typeString = "boolean";
-                    	}
-                    	else
-                    	{
-                        	typeString = "string";
-                    	}
-                	}
-                	
-                	// Creating and setting HashMap for the attribute and its metadata
-                    HashMap<String, String> attrVal = new HashMap<String, String>();
-                	attrVal.put("attr", attr);
-                	attrVal.put("valStr", valStr);
-                	attrVal.put("type", typeString);
-
-                    // Adding HashMap to ArrayList attrVals
-                	attrVals.add(attrVal);
-            	}
-                // Getting table name
-                tableName = stmt.getTable().toString();
-
-                // Calling AGInsert convenience method
-        		AGInsert(tableName, attrVals);
-        	}
-        }
-    }
-	
 	/**
 	 *
 	 */
-    public void doCreateTable(CreateTable stmt) throws SQLException {
-        String modelName = connection.getModel();
-        String tableName = stmt.getTable().getName();
-        //String namedGraph = "<www.example.org/" + tableName + ">";
-        String namedGraph = "";
-        String attribute;
-        String type;
-        String xsdType;
+	//public void doInsert(Insert stmt) throws SQLException { // Old method signature
+	public void doInsert(Insert stmt, String getConnectionType) throws SQLException {//New method signature
+		if (stmt.getColumns() != null) {
+			this.connectionType = getConnectionType;
 
-        SPARQLDoer.createQuadStore(connection);
-        SPARQLDoer.insertObjectPropQuad(connection, namedGraph, "rdf:type", "rdfs:Class");
+			// Inserting into Oracle RDF
+			if (connectionType == "rdf_mode") {
+				Iterator valsIt = ((ExpressionList)stmt.getItemsList()).getExpressions().iterator();
+				String id = Integer.toString(SPARQLDoer.getNextGUID(connection));
+				String subject = id;
+				String attvalPairs = "DBUNIQUEID" + " := " + id + " ";
 
-        if (stmt.getColumnDefinitions() != null) {
-            for (Iterator colsIt = stmt.getColumnDefinitions().iterator(); colsIt.hasNext(); ) {
-                ColumnDefinition col = (ColumnDefinition)colsIt.next();
-                attribute = col.getColumnName();
-                type = col.getColDataType().getDataType();
+				for (Iterator colsIt = stmt.getColumns().iterator(); colsIt.hasNext(); ) {
+					String attr = ((Column)colsIt.next()).getColumnName().replaceAll("'", "").replaceAll("\"", "");
+					Object attrValue = valsIt.next();
+					String valStr = (attrValue.toString().replaceAll("'", "")).replaceAll("\'", "").replaceAll("\"", "");
+					attvalPairs += attr + " := " + valStr + " ";
+				}
 
-                if (type.toLowerCase().equals("numeric") || type.toLowerCase().equals("decimal") ||
-                    type.toLowerCase().equals("real")) {
-                    xsdType = "xsd:decimal"; // was decimal
-                } else if (type.toLowerCase().equals("varchar") || type.toLowerCase().equals("varchar2")) {
-                    xsdType = "xsd:string"; // was string
-                } else if (type.toLowerCase().equals("bit") || type.toLowerCase().equals("tinyint") ||
-                           type.toLowerCase().equals("bigint")) {
-                    xsdType = "xsd:integer"; // was integer
-                } else if (type.toLowerCase().equals("date")) {
-                    xsdType = "xsd:date"; // was date
-                } else {
-                    xsdType = "xsd:decimal"; // was decimal
-                }
+				ProcessLanguages processLanguage = new ProcessLanguages(connection);
+				processLanguage.processSIM("INSERT " + stmt.getTable().toString() + " " + attvalPairs);
 
-                SPARQLDoer.insertObjectPropQuad(connection, attribute, "rdf:type", "owl:DatatypeProperty");
-                SPARQLDoer.insertObjectPropQuad(connection, attribute, "rdfs:domain", tableName);
-                SPARQLDoer.insertObjectPropQuad(connection, attribute, "rdf:range", "rdfs:" + xsdType);
-            }
-        }
-    }
-	
-    private Collection<String> returns_instances_of = null; 
+				// Inserting into AllegroGraph
+			} else if (connectionType == "ag_sql_rdf_mode") {
+
+				String tableName = null;
+				ArrayList<HashMap<String, String>> attrVals = new ArrayList<HashMap<String, String>>();
+
+				Iterator valsIt = ((ExpressionList)stmt.getItemsList()).getExpressions().iterator();
+				for (Iterator colsIt = stmt.getColumns().iterator(); colsIt.hasNext(); ) {
+					String attr = ((Column)colsIt.next()).getColumnName().replaceAll("'", "").replaceAll("\"", "");
+					Object attrValue = valsIt.next();
+					String valStr = (attrValue.toString().replaceAll("'", "")).replaceAll("\'", "").replaceAll("\"", "");
+					// Determine a type string for our object being inserted.
+					String typeString = null;
+					if (attrValue instanceof LongValue)
+					{
+						typeString = "integer";
+					}
+					else if(attrValue instanceof DoubleValue)
+					{
+						typeString = "float";
+					}
+					else
+					{
+						if(valStr.toUpperCase().equals("TRUE") || valStr.toUpperCase().equals("FALSE"))
+						{
+							typeString = "boolean";
+						}
+						else
+						{
+							typeString = "string";
+						}
+					}
+
+					// Creating and setting HashMap for the attribute and its metadata
+					HashMap<String, String> attrVal = new HashMap<String, String>();
+					attrVal.put("attr", attr);
+					attrVal.put("valStr", valStr);
+					attrVal.put("type", typeString);
+
+					// Adding HashMap to ArrayList attrVals
+					attrVals.add(attrVal);
+				}
+				// Getting table name
+				tableName = stmt.getTable().toString();
+
+				// Calling AGInsert convenience method
+				AGInsert(tableName, attrVals);
+			}
+		}
+	}
+
+	/**
+	 *
+	 */
+	public void doCreateTable(CreateTable stmt) throws SQLException {
+		String modelName = connection.getModel();
+		String tableName = stmt.getTable().getName();
+		//String namedGraph = "<www.example.org/" + tableName + ">";
+		String namedGraph = "";
+		String attribute;
+		String type;
+		String xsdType;
+
+		SPARQLDoer.createQuadStore(connection);
+		SPARQLDoer.insertObjectPropQuad(connection, namedGraph, "rdf:type", "rdfs:Class");
+
+		if (stmt.getColumnDefinitions() != null) {
+			for (Iterator colsIt = stmt.getColumnDefinitions().iterator(); colsIt.hasNext(); ) {
+				ColumnDefinition col = (ColumnDefinition)colsIt.next();
+				attribute = col.getColumnName();
+				type = col.getColDataType().getDataType();
+
+				if (type.toLowerCase().equals("numeric") || type.toLowerCase().equals("decimal") ||
+						type.toLowerCase().equals("real")) {
+					xsdType = "xsd:decimal"; // was decimal
+				} else if (type.toLowerCase().equals("varchar") || type.toLowerCase().equals("varchar2")) {
+					xsdType = "xsd:string"; // was string
+				} else if (type.toLowerCase().equals("bit") || type.toLowerCase().equals("tinyint") ||
+						type.toLowerCase().equals("bigint")) {
+					xsdType = "xsd:integer"; // was integer
+				} else if (type.toLowerCase().equals("date")) {
+					xsdType = "xsd:date"; // was date
+				} else {
+					xsdType = "xsd:decimal"; // was decimal
+				}
+
+				SPARQLDoer.insertObjectPropQuad(connection, attribute, "rdf:type", "owl:DatatypeProperty");
+				SPARQLDoer.insertObjectPropQuad(connection, attribute, "rdfs:domain", tableName);
+				SPARQLDoer.insertObjectPropQuad(connection, attribute, "rdf:range", "rdfs:" + xsdType);
+			}
+		}
+	}
+
+	private Collection<String> returns_instances_of = null;
 	private String connectionType = null;
 	/**
 	 *
-	 */	 
+	 */
 	public String getSelect(Select select, Collection<String> instance_type_names, String getConnectionType) throws SQLException, JSQLParserException, ownIllegalSQLException{
 		this.returns_instances_of = instance_type_names;
 		// Initialize Validator
 		SQLValidator validator = new SQLValidator();
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
+		String SPARQL = "";
+		this.connectionType = getConnectionType;
+
+		if (connection.getDebug() == "debug") System.out.println("SQL statement: |" + select + "|");
+<<<<<<< HEAD
+=======
 	    String SPARQL = "";
+        subselect = false;
 	    this.connectionType = getConnectionType;
 		
 		if (connection.getDebug() == "debug") System.out.println("SQL statement: |" + select + "|");	
+>>>>>>> parent of c37b007... Some Changes
+=======
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
 		//Setting depth for subqueries, asumming subqueries on the where clause
 		select.getSelectBody().accept(this);
 		
@@ -415,56 +437,30 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		}
 */
 		SPARQL += subq.pop() + endOfStmt;
+		//if (subselect) subq.pop();
+		//System.out.println("The current query0 in subq is: " + SPARQL);
+
 		//Building SPARQL Statement
-		while(!subq.isEmpty()){
+		/*while(!subq.isEmpty()){
     			SPARQL += subq.pop() + endOfStmt + ")";
-		}
-		
+                //System.out.println("The current query1 in subq is: " + SPARQL);
+		}*/
+
+		//System.out.println("Final Reading subq");
 		if (connection.getDebug() == "debug") System.out.println("RDF conversion of select:\n |" + SPARQL + "| END");
 		return SPARQL;
 	}
+	/* Current subquery */
+	private String tempSub;
+<<<<<<< HEAD
+<<<<<<< HEAD
 
-    public String getSelect(SubSelect select, Collection<String> instance_type_names, String getConnectionType) throws SQLException, JSQLParserException, ownIllegalSQLException{
-        this.returns_instances_of = instance_type_names;
-        // Initialize Validator
-        SQLValidator validator = new SQLValidator();
-        String SPARQL = "";
-        this.connectionType = getConnectionType;
-        
-        if (connection.getDebug() == "debug") System.out.println("SQL statement: |" + select + "|");    
-        //Setting depth for subqueries, asumming subqueries on the where clause
-        select.getSelectBody().accept(this);
-        
-/*      
-        System.out.println(select.getWithItemsList() + "\n\n");
-        try{
-            if(!ownException.equals("")){
-                throw new ownIllegalSQLException(ownException);
-            }
-        } catch (ownIllegalSQLException e){
-            System.out.println(e);
-            return e.toString();
-        }
-*/
-        SPARQL += subq.pop() + endOfStmt;
-        //Building SPARQL Statement
-        while(!subq.isEmpty()){
-                SPARQL += subq.pop() + endOfStmt + ")";
-        }
-        
-        if (connection.getDebug() == "debug") System.out.println("RDF conversion of select:\n |" + SPARQL + "| END");
-        return SPARQL;
-    }
+=======
+	
+>>>>>>> parent of c37b007... Some Changes
+=======
 
-    /* Current subquery */
-    private String tempSub;
-
-    /*public String doSubselect(Select select, Collection<String> instance_type_names, String getConnectionType) throws SQLException, JSQLParserException, ownIllegalSQLException {
-        tempSub = getSelect(select, instance_type_names, getConnectionType);
-        return tempSub;
-    }*/
-
-		
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
 	/**
 	 *
 	 */
@@ -476,6 +472,15 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		List<String> orderby = new ArrayList<String>();
 		List<String> groupby = new ArrayList<String>();
 		List<String> having = new ArrayList<String>();
+<<<<<<< HEAD
+<<<<<<< HEAD
+		//List<String> subselects = new ArrayList<String>();
+=======
+		List<String> subselects = new ArrayList<String>();
+>>>>>>> parent of c37b007... Some Changes
+=======
+		//List<String> subselects = new ArrayList<String>();
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
 		HashMap<String,String> tablesAliases = new HashMap<String,String>();
 		HashMap<String,String> tables2alias = new HashMap<String,String>();
 		LinkedHashMap<String,String> columnsAs = new LinkedHashMap<String,String>();
@@ -483,44 +488,105 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 
 		List<String> joinColumns = new ArrayList<String>();
 
-		tempSub = visitSelect_buildSPARQL(plainSelect, subselects, filters, tables, orderby, groupby, having, tablesAliases, tables2alias, columnsAs, aggrColumnsAs, joinColumns);
+		tempSub = visitSelect_buildSPARQL(plainSelect, filters, tables, orderby, groupby, having, tablesAliases, tables2alias, columnsAs, aggrColumnsAs, joinColumns);
 
 		subq.add(tempSub);
+		subselects.add(tempSub);
+
+		System.out.println("Inside PlainSelect subq: " + subselects.get(0));
+<<<<<<< HEAD
 	}
-	
+
+	public ResultSet querySubselect(String ReLstmt) {
+        /*System.out.println("Statemnt: " + ReLstmt);
+        System.out.println();*/
+		// Data structure for result set of SPARQL query
+		ArrayList<String> queryResults = new ArrayList<String>();
+		ResultSet rs = null;
+		try {
+			rs = connection.executeQuery(ReLstmt);
+            /*ResultSetMetaData rsmd = rs.getMetaData();
+            int cc = rsmd.getColumnCount();
+            int dbuniqueid_idx = -1; 
+            for (int i = 1; i <= cc; i++) {
+                queryResults.add(rsmd.getColumnName(i));
+                if(rsmd.getColumnName(i).equals("DBUNIQUEID")) {
+                    dbuniqueid_idx = i - 1; 
+                }
+            }*/
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+        /*System.out.println("Inside the Changes: " + queryResults.get(0));
+        System.out.println();*/
+		return rs;
+	}
+
+=======
+	}
+
+	public ResultSet querySubselect(String ReLstmt) {
+        /*System.out.println("Statemnt: " + ReLstmt);
+        System.out.println();*/
+		// Data structure for result set of SPARQL query
+		ArrayList<String> queryResults = new ArrayList<String>();
+		ResultSet rs = null;
+		try {
+			rs = connection.executeQuery(ReLstmt);
+            /*ResultSetMetaData rsmd = rs.getMetaData();
+            int cc = rsmd.getColumnCount();
+            int dbuniqueid_idx = -1; 
+            for (int i = 1; i <= cc; i++) {
+                queryResults.add(rsmd.getColumnName(i));
+                if(rsmd.getColumnName(i).equals("DBUNIQUEID")) {
+                    dbuniqueid_idx = i - 1; 
+                }
+            }*/
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+        /*System.out.println("Inside the Changes: " + queryResults.get(0));
+        System.out.println();*/
+		return rs;
+	}
+
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
+
 	/**
 	 * Convenience method called by visitSelect_buildSPARQL. Perhaps a better implementation would be to create
-     * a custom class called MyTriple? MyTriple would have three class variables: subject, predicate, and object.
-     * These three variables would store the triple values of subject, predicate, and object.
-     * Returns an ArrayList representing the result set of SPARQL query.
+	 * a custom class called MyTriple? MyTriple would have three class variables: subject, predicate, and object.
+	 * These three variables would store the triple values of subject, predicate, and object.
+	 * Returns an ArrayList representing the result set of SPARQL query.
 	 */
 	public ArrayList<String> queryAG(String queryString) {
-		
-        // Data structure for result set of SPARQL query
-        ArrayList<String> queryResults = new ArrayList<String>();
+
+		// Data structure for result set of SPARQL query
+		ArrayList<String> queryResults = new ArrayList<String>();
 		try {
-            // Boiler plate code to establish connection to AG repository.
+			// Boiler plate code to establish connection to AG repository.
 			AGServer server = new AGServer(SERVER_URL, USERNAME, PASSWORD);
-       		AGCatalog catalog = server.getCatalog(CATALOG_ID);
-        	AGRepository myRepository = catalog.openRepository(REPOSITORY_ID);
-        	AGRepositoryConnection conn = myRepository.getConnection();
+			AGCatalog catalog = server.getCatalog(CATALOG_ID);
+			AGRepository myRepository = catalog.openRepository(REPOSITORY_ID);
+			AGRepositoryConnection conn = myRepository.getConnection();
 
-        	// Boiler plate code to create variable of type AGModel for SPARQL query.
-            AGGraphMaker maker = new AGGraphMaker(conn);
-            // Graph should be "http://www.example.org/people.owl" instead of default-graph?
-        	AGGraph graph = maker.getGraph();
-        	AGModel model = new AGModel(graph);
+			// Boiler plate code to create variable of type AGModel for SPARQL query.
+			AGGraphMaker maker = new AGGraphMaker(conn);
+			// Graph should be "http://www.example.org/people.owl" instead of default-graph?
+			AGGraph graph = maker.getGraph();
+			AGModel model = new AGModel(graph);
 
-        	try {
-                // Boiler plate code to execute AG Query
-            	AGQuery sparql = AGQueryFactory.create(queryString);
-            	QueryExecution qe = AGQueryExecutionFactory.create(sparql, model);
-            	try {
-               		com.hp.hpl.jena.query.ResultSet results = qe.execSelect();
-               		while (results.hasNext()) {
-                   		QuerySolution result = results.next();
-                        // Note that result.varNames() returns an iterator of string, sorted in alphabetical order.
-                   		Iterator<String> varNames = result.varNames();
+			try {
+				// Boiler plate code to execute AG Query
+				AGQuery sparql = AGQueryFactory.create(queryString);
+				QueryExecution qe = AGQueryExecutionFactory.create(sparql, model);
+				try {
+					com.hp.hpl.jena.query.ResultSet results = qe.execSelect();
+					while (results.hasNext()) {
+						QuerySolution result = results.next();
+						// Note that result.varNames() returns an iterator of string, sorted in alphabetical order.
+						Iterator<String> varNames = result.varNames();
 						StringBuilder sb = new StringBuilder();
 						while(varNames.hasNext()) {
 							String var = varNames.next();
@@ -528,15 +594,15 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 							sb.append(rdfNode.toString() + " ");
 						}
 						queryResults.add(sb.toString());
-                	}
-            	} finally {
-               		qe.close();
-            	}
-        	} finally {
-           		model.close();
-        	}
-       		conn.close();
-       		myRepository.shutDown();
+					}
+				} finally {
+					qe.close();
+				}
+			} finally {
+				model.close();
+			}
+			conn.close();
+			myRepository.shutDown();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.exit(-1);
@@ -548,20 +614,20 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 	 * Build the SPARQL for a SELECT statement.
 	 */
 	public String visitSelect_buildSPARQL(
-	               PlainSelect plainSelect,
-                   List<String> subselects, 
-				   List<String> filters,
-				   List<String> tables,
-				   List<String> orderby,
-				   List<String> groupby,
-				   List<String> having,
-				   HashMap<String, String> tablesAliases,
-				   HashMap<String, String> tables2alias,
-				   LinkedHashMap<String, String> columnsAs,
-				   LinkedHashMap<String, String> aggrColumnsAs,
-				   List<String> joinColumns)
-	{ 
-	
+			PlainSelect plainSelect,
+			List<String> filters,
+			List<String> tables,
+			List<String> orderby,
+			List<String> groupby,
+			List<String> having,
+			HashMap<String, String> tablesAliases,
+			HashMap<String, String> tables2alias,
+			LinkedHashMap<String, String> columnsAs,
+			LinkedHashMap<String, String> aggrColumnsAs,
+			List<String> joinColumns)
+	{
+		if (subselect) tables = tab;
+
 		// Visit the Select statement and build structures necessary to build the SPARQL statement.
 
 		// Get all table names from the RDF data.
@@ -569,40 +635,68 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		List<String> RDFTableNames = new ArrayList<String>();
 		SPARQLHelper sparqlHelper = new SPARQLHelper(connection);
 
-        if(connectionType == "rdf_mode") { 
+		if(connectionType == "rdf_mode") {
 			try {		// Get all of the classes (i.e., table names in this case) in the SCHEMA graph	
 				RDFtables = sparqlHelper.getSubjects(sparqlHelper.getSchemaString(), "rdf:type", "rdfs:Class");
-				if (subselect) RDFTableNames.add(subselects.get(0));
-                else {
-                    for (String t : RDFtables) {
-    				   RDFTableNames.add(t);
-    				}
-                }
+				for (String t : RDFtables) {
+<<<<<<< HEAD
+<<<<<<< HEAD
+					RDFTableNames.add(t);
+=======
+				   RDFTableNames.add(t);
+>>>>>>> parent of c37b007... Some Changes
+=======
+					RDFTableNames.add(t);
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
+				}
 			} catch (SQLException ex) {
 				System.out.println(ex);
 			}
 			// Check to see if there are any table names that differ only by case.
-			if (subselect) RDFTableNames.add(subselects.get(0));
-            else {
-                for (String t1 : RDFTableNames) {
-    			   for (String t2 : RDFTableNames) {
-    				  if((! t1.equals(t2)) && t1.toUpperCase().equals(t2.toUpperCase()))
-    					  System.out.println("Table name " + t1 + " and table name " + t2 + " appear in the RDF data, this is probably an error.");
-    			   }
-    			}
-            }
-            subselect = false;
+			for (String t1 : RDFTableNames) {
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
+				for (String t2 : RDFTableNames) {
+					if((! t1.equals(t2)) && t1.toUpperCase().equals(t2.toUpperCase()))
+						System.out.println("Table name " + t1 + " and table name " + t2 + " appear in the RDF data, this is probably an error.");
+				}
+			}
+<<<<<<< HEAD
+		} else if(connectionType == "ag_sql_rdf_mode") {
+			ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?sub rdfs:domain ?obj . }");
+			for (String tuple : queryResults) {
+				String parts[] = tuple.split(" ")[0].split("#");//Not a good way to obtain the table names
+				if (!RDFTableNames.contains(parts[parts.length - 1])) {
+					RDFTableNames.add(parts[parts.length - 1]);
+				}
+			}
+=======
+			   for (String t2 : RDFTableNames) {
+				  if((! t1.equals(t2)) && t1.toUpperCase().equals(t2.toUpperCase()))
+					  System.out.println("Table name " + t1 + " and table name " + t2 + " appear in the RDF data, this is probably an error.");
+			   }
+			}
 		} else if(connectionType == "ag_sql_rdf_mode") {
 		    ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?sub rdfs:domain ?obj . }");
-            if (subselect) queryResults = queryAG(subselects.get(0));
-            else queryResults = queryAG("SELECT * WHERE { ?sub rdfs:domain ?obj . }");
-                //RDFTableNames.add(subselects.get(0));
-    		for (String tuple : queryResults) {
-    		    String parts[] = tuple.split(" ")[0].split("#");//Not a good way to obtain the table names 
-    		    if (!RDFTableNames.contains(parts[parts.length - 1])) {
+		    for (String tuple : queryResults) {
+		    	String parts[] = tuple.split(" ")[0].split("#");//Not a good way to obtain the table names 
+		    	if (!RDFTableNames.contains(parts[parts.length - 1])) {
                     RDFTableNames.add(parts[parts.length - 1]);
-    		    }
-            }
+                }
+		    }
+>>>>>>> parent of c37b007... Some Changes
+=======
+		} else if(connectionType == "ag_sql_rdf_mode") {
+			ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?sub rdfs:domain ?obj . }");
+			for (String tuple : queryResults) {
+				String parts[] = tuple.split(" ")[0].split("#");//Not a good way to obtain the table names
+				if (!RDFTableNames.contains(parts[parts.length - 1])) {
+					RDFTableNames.add(parts[parts.length - 1]);
+				}
+			}
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
 		}
 
 // End getting all table names from the RDF data.
@@ -620,12 +714,28 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 			if(tableName.toUpperCase().equals(t.toUpperCase()))
 				tmpTableName = t;
 		}
+        /*if (subselect) {
+            try {
+                ResultSet rs = connection.executeQuery(subselects.get(0));
+                ResultSetMetaData rsmd = rs.getMetaData();
+                int cc = rsmd.getColumnCount();
+                for (int i = 1; i <= cc; i++) {
+                    System.out.println(rsmd.getTableName(1));
+                    if (!tables.contains(rsmd.getTableName(i)))
+                        tables.add(rsmd.getTableName(i));
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                System.exit(-1);
+            }
+        } else {*/
 		if( ! tmpTableName.equals("")) {
-		   tables.add(tmpTableName);
-		   tablesAliases.put((alias == null ? tmpTableName : alias), tmpTableName);
-		   tables2alias.put(tmpTableName, (alias == null ? tmpTableName : alias));
+			tables.add(tmpTableName);
+			tablesAliases.put((alias == null ? tmpTableName : alias), tmpTableName);
+			tables2alias.put(tmpTableName, (alias == null ? tmpTableName : alias));
 		}
 		else System.out.println("Table name " + tableName + " does not exist in the RDS data.");
+		//}
 
 		if (plainSelect.getJoins() != null) {
 			for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
@@ -638,7 +748,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 				tableName = temp;
 				tmpTableName = "";
 				for (String t : RDFTableNames) {
-				   if(tableName.toUpperCase().equals(t.toUpperCase())) tmpTableName = t;
+					if(tableName.toUpperCase().equals(t.toUpperCase())) tmpTableName = t;
 				}
 				if( ! tmpTableName.equals("")) {
 					tables.add(tmpTableName);
@@ -652,37 +762,37 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 
 // This map (tableSymbols) of table names to unique, short symbols will be used later in several places.
 		HashMap<String,String> tableSymbols = new HashMap<String,String>();
-	    int n = 1;
-	    for (String s : tables) {
-	       tableSymbols.put(s, "s" + n);
-           n++;
-	    }
+		int n = 1;
+		for (String s : tables) {
+			tableSymbols.put(s, "s" + n);
+			n++;
+		}
 
 // Get all column names from tables.
 		List<String> columnNames = new ArrayList<String>();
-        if(connectionType == "rdf_mode") {  
-			List<String> columns = null;  
-			for (String table : tables) { 
+		if(connectionType == "rdf_mode") {
+			List<String> columns = null;
+			for (String table : tables) {
 				try {		// Get all of the column names for each of the tables.	
 					columns = sparqlHelper.getSubjects(table + "_" +sparqlHelper.getSchemaString(), "rdfs:domain", ":" + table);
 					for (String column : columns) {
-					   columnNames.add(tables2alias.get(table) + "." + column);
+						columnNames.add(tables2alias.get(table) + "." + column);
 					}
 				} catch (SQLException ex) {
 					System.out.println(ex);
 				}
 			}
 		} else if(connectionType == "ag_sql_rdf_mode") {
-		    ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?col rdfs:domain <" + PREFIX + "Person> .\n" +
-		    	"?s1 ?col ?v . }");
-		    for (String tuple : queryResults) {
-		    	String parts[] = tuple.split(" ")[0].split("#");//Not a good way to obtain the column names
-                // Add column name to columnNames if columnNames does not contain column name and if column name is not
-                // "DBUNIQUEID"
-		    	if (!columnNames.contains(parts[parts.length - 1]) && !parts[parts.length - 1].equals("DBUNIQUEID")) {
-                    columnNames.add(parts[parts.length - 1]);
-                }
-		    }
+			ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?col rdfs:domain <" + PREFIX + "Person> .\n" +
+					"?s1 ?col ?v . }");
+			for (String tuple : queryResults) {
+				String parts[] = tuple.split(" ")[0].split("#");//Not a good way to obtain the column names
+				// Add column name to columnNames if columnNames does not contain column name and if column name is not
+				// "DBUNIQUEID"
+				if (!columnNames.contains(parts[parts.length - 1]) && !parts[parts.length - 1].equals("DBUNIQUEID")) {
+					columnNames.add(parts[parts.length - 1]);
+				}
+			}
 		}
 
 // End getting column names.
@@ -718,14 +828,14 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 					if (resGroupbyElem == "")
 						resGroupbyElem = groupbyElem;
 					allCols.add(resGroupbyElem);
-					groupby.add("?v" + allCols.size());	
+					groupby.add("?v" + allCols.size());
 				}
 				i++;
 			}
 		}
 
 // Get column names to project.
-        if(plainSelect.getSelectItems() != null) {
+		if(plainSelect.getSelectItems() != null) {
 			//gets the columns that are asked of
 			for(Iterator i=plainSelect.getSelectItems().iterator(); i.hasNext();) {
 				int cnt = 0;
@@ -738,7 +848,11 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 
 				// if selecting everything
 				if(temp.equals("*")){
-					columnsAs.put("*", "*");
+					if (subselect) {
+						columnsAs = columnsas;
+					} else {
+						columnsAs.put("*", "*");
+					}
 				}
 				else{
 					// If aggregate (no alias)
@@ -761,8 +875,8 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 							if (columnName == "")
 								columnName = aggregateElement[1];
 							columnName = aggregateElement[0].toUpperCase() + "(" + columnName + ")";
-							aggrColumnsAs.put("?v" + pos, 
-											  "\"" + aliasName.replace("\"", "") + "\"");
+							aggrColumnsAs.put("?v" + pos,
+									"\"" + aliasName.replace("\"", "") + "\"");
 						}
 						else{
 							String tcolName = columnName;
@@ -771,7 +885,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 								columnName = tcolName;
 						}
 						columnsAs.put("?v" + pos, "\"" + aliasName.replace("\"", "") + "\"");
-						allCols.add(columnName);
+						if (!allCols.contains(columnName)) allCols.add(columnName);
 					}
 					else { // Non alias, non aggregate
 						columnName = item.toString();
@@ -779,90 +893,90 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 						if ((tcolName = resolveColumnName(columnNames, columnName)) != "")
 							columnName = tcolName;
 						columnsAs.put("?v" + pos, "\"" + columnName.substring(columnName.lastIndexOf(".") + 1) + "\"");
-						allCols.add(columnName);
+						if (!allCols.contains(columnName)) allCols.add(columnName);
+					}
+					if (subselect) {
+						LinkedHashMap<String,String> ta = new LinkedHashMap<String,String>();
+						for (Map.Entry<String, String> entry : columnsAs.entrySet()) {
+							if (columnsas.containsValue(entry.getValue())) {
+								ta.put(entry.getKey(), entry.getValue());
+							}
+						}
+						if (ta.size() > 0) {
+							columnsAs.clear();
+							columnsAs = ta;
+						} else {
+							System.out.println("The columns are not part of the subquery");
+							columnsAs.clear();
+						}
 					}
 				}
 			}
 		}
-		
+
 // End getting column names to project.	
+
 
 // Get join column names.	
 		if (plainSelect.getJoins() != null) {
 			for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
 				Join join = (Join) joinsIt.next
-				();
+						();
 				if(join.getOnExpression() != null) {
 					join.getOnExpression().accept(this);
-                    String s = join.toString().substring(join.toString().lastIndexOf("ON (") + 4);
+					String s = join.toString().substring(join.toString().lastIndexOf("ON (") + 4);
 					String[] split = s.substring(0,s.length()-1).split(" = ");
 					String col1 = resolveColumnName(columnNames, split[0]);
 					String col2 = resolveColumnName(columnNames, split[1]);
-                    joinColumns.add(col1 + " = " + col2);
+					joinColumns.add(col1 + " = " + col2);
 				}
 			}
 		}
-	
+
 // End getting join column names.
 
 // Process WHERE statement if any.
-        if (plainSelect.getWhere() != null) { //ie, there's a where clause
-                String s = plainSelect.getWhere().toString().replace(" and ", " &&  and ");
-                s = s.replace(" AND ", " &&  and ");
-                s = s.replace(" or ", " ||  and ");
-                s = s.replace(" OR ", " ||  and ");
-			    String[] whereClauses = s.split(" and | AND | or | OR ");
-			    String fColumns = "";
-			    String filter = "\tFILTER(";
-                n = 1;
-				for (String c : whereClauses) {
-					for (String ineq : inequalities) {						
-	                    if (c.contains(ineq)) {
-	                    	String left = "";
-						    left = resolveColumnName(columnNames, c.split(ineq)[0]);
-						    if(left.equals(""))
-						    	filter += c.split(ineq)[0];
-						    else {
-								fColumns += "\t?" + tableSymbols.get(tablesAliases.get(left.split("\\.")[0])) + " :" + left.split("\\.")[1] + " ?f" + n + " .\n";
-								filter += "?f" + n;
-								n++;
-						    }
-						    filter += ineq;
-						    String right = resolveColumnName(columnNames, c.split(ineq)[1]);
-						    if(right.equals(""))
-						    	filter += ":" + c.split(ineq)[1];
-						    else {
-								fColumns += "\t?" + tableSymbols.get(tablesAliases.get(right.split("\\.")[0])) + " :" + left.split("\\.")[1] + " ?f" + n + " .\n";
-			                	    // So fColumns will be set = ?s1 :eventType ?f1 .
-								filter += "?f" + n;
-		                    	n++;
-		                	}
-		                }
+		if (plainSelect.getWhere() != null) { //ie, there's a where clause
+			String s = plainSelect.getWhere().toString().replace(" and ", " &&  and ");
+			s = s.replace(" AND ", " &&  and ");
+			s = s.replace(" or ", " ||  and ");
+			s = s.replace(" OR ", " ||  and ");
+			String[] whereClauses = s.split(" and | AND | or | OR ");
+			String fColumns = "";
+			String filter = "\tFILTER(";
+			n = 1;
+			for (String c : whereClauses) {
+				for (String ineq : inequalities) {
+					if (c.contains(ineq)) {
+						String left = "";
+						left = resolveColumnName(columnNames, c.split(ineq)[0]);
+						if(left.equals(""))
+							filter += c.split(ineq)[0];
+						else {
+							fColumns += "\t?" + tableSymbols.get(tablesAliases.get(left.split("\\.")[0])) + " :" + left.split("\\.")[1] + " ?f" + n + " .\n";
+							filter += "?f" + n;
+							n++;
+						}
+						filter += ineq;
+						String right = resolveColumnName(columnNames, c.split(ineq)[1]);
+						if(right.equals(""))
+							filter += ":" + c.split(ineq)[1];
+						else {
+							fColumns += "\t?" + tableSymbols.get(tablesAliases.get(right.split("\\.")[0])) + " :" + left.split("\\.")[1] + " ?f" + n + " .\n";
+							// So fColumns will be set = ?s1 :eventType ?f1 .
+							filter += "?f" + n;
+							n++;
+						}
 					}
-                    String x = "select";
-                    if ((c.indexOf(x) >= 0) || (c.indexOf(x.toUpperCase()) >= 0)) {
-                        String ss = "";
-                        String nn = "";
-                        if (c.indexOf("IN") >= 0) {
-                            ss = c.substring(c.indexOf("IN") + 3, c.lastIndexOf(")") + 1);
-                            nn = c.substring(0, c.indexOf("IN") - 1);
-                        }
-                        else if (c.indexOf("in") >= 0) {
-                            ss = c.substring(c.indexOf("in") + 3, c.lastIndexOf(")") + 1);
-                            nn = c.substring(0, c.indexOf("in") - 1);
-                        }   
-                        System.out.println("This is my test: " + ss);
-                        subselects.add(ss);
-                        filter += ":" + nn + " IN ()";
-                    }
 				}
-				filters.add(fColumns + filter.replace("'", "") + ") ");
+			}
+			filters.add(fColumns + filter.replace("'", "") + ") ");
 		}
 
 // End processing WHERE statement.
-		
+
 // Process Order By statement
-	
+
 		if(plainSelect.getOrderByElements() != null) {
 			String orderByStmnt = plainSelect.getOrderByElements().toString().toLowerCase();
 			orderByStmnt = orderByStmnt.substring(1, orderByStmnt.length() - 1);
@@ -887,7 +1001,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 					s = s + "?v" + allCols.size();
 			}
 			orderby.add(s);
-		}	
+		}
 
 
 // Process "having" statement
@@ -899,9 +1013,9 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		 */
 		if (plainSelect.getHaving() != null){
 			String s = plainSelect.getHaving().toString().replace(" and ", " &&  and ");
-            s = s.replace(" AND ", " &&  and ");
-            s = s.replace(" or ", " ||  and ");
-            s = s.replace(" OR ", " ||  and ");
+			s = s.replace(" AND ", " &&  and ");
+			s = s.replace(" or ", " ||  and ");
+			s = s.replace(" OR ", " ||  and ");
 			String[] havingElems = s.split(" and | AND | or | OR | ");
 			boolean success = false;
 			String str = "HAVING(";
@@ -912,7 +1026,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 				if (havingElems[i].equals("&&") || havingElems[i].equals("||")){
 					str += havingElems[i] + " ";
 					continue;
-				}				
+				}
 
 				try{
 					Integer.parseInt(havingElems[i]);
@@ -930,7 +1044,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 						break;
 					}
 				}
-						
+
 				if (success) continue;
 
 				//get resolved name && check if there's something other than aggregates that use parentheses
@@ -938,7 +1052,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 				String aggregateElement[] = getAggregateSelect(havingElems[i]);
 				if (aggregateElement != null)
 					resolvedName = resolveColumnName(columnNames, aggregateElement[1]);
-				else 
+				else
 					resolvedName = resolveColumnName(columnNames, havingElems[i]);
 				int pos = groupby.size() - 1;
 				for (String aggr: aggrColumnsAs.keySet()){
@@ -960,7 +1074,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		if (connection.getDebug() == "debug") {
 			System.out.println("\nvisitSelect_buildSPARQL Structures necessary to build the SPARQL statement:");
 			System.out.println("\t - plainSelect: " + plainSelect);
-            System.out.println("\t - subSelect: " + subselects);
 			System.out.println("\t - RDFTableNames: " + RDFTableNames);
 			System.out.println("\t - tables: " + tables);
 			System.out.println("\t - tablesAliases: " + tablesAliases);
@@ -972,60 +1085,61 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 			System.out.println("\t - joinColumns: " + joinColumns);
 			System.out.println("\t - filters: " + filters);
 			System.out.println("\t - orderby: " + orderby);
-			System.out.println("\t - groupby: " + groupby);	
+			System.out.println("\t - groupby: " + groupby);
 			System.out.println("\t - having: " + having);
 			System.out.println("\t - allCols: " + allCols);
 		}
-		
+
 //Build SPARQL.
-	    
-        String SPARQL = "";
+
+		String SPARQL = "";
 		if(connectionType == "rdf_mode") {
-        	SPARQL = "SELECT ";
-        }
-        String tmpSparql = "";
-        n = 0;
-        // Add the columns to be projected to the SPARQL string. 
-        boolean nonExistentColumns = false;
-       
-	   LinkedHashMap<String,String> tmpColumnsAs = new LinkedHashMap<String,String>();
-       // If select * ...", replace * in columnsAs with all column names.
-	   if(columnsAs.get("*") != null) {
-		   if(columnsAs.get("*").equals("*")) {
-			  columnsAs.remove("*");
-			  String filter = "";
-			  if(filters != null) if (filters.size() != 0) filter = filters.get(0);
-			  for (String table : tables) {
-		         List<String> columns = new ArrayList<String>();
-	             try {
-				    if(connectionType == "rdf_mode") {
-						columns = sparqlHelper.getSubjects(table + "_" +sparqlHelper.getSchemaString(), "rdfs:domain", ":" + table);
-					} else if(connectionType == "ag_sql_rdf_mode") {
-						ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?col rdfs:domain <" + PREFIX + "Person> .\n" +
-		    				"?s1 ?col ?v . }");
-		    			for (String tuple : queryResults) {
-		    				String parts[] = tuple.split(" ")[0].split("#");//JOOJAY: Not a good way to obtain the column names
-		    				// Add column name to columns if columns does not contain column name and if column name is not
-                            // "DBUNIQUEID"
-                            if (!columns.contains(parts[parts.length - 1]) && !parts[parts.length - 1].equals("DBUNIQUEID")) {
-                                columns.add(parts[parts.length - 1]);
-                            }
-		    			}
-					}
-			        for (String column : columns) {
-                       if( ! column.equals("DBUNIQUEID")) {
-						   columnsAs.put(tables2alias.get(table) + "." + column, "\"" + column + "\"");
-						   allCols.add(tables2alias.get(table) + "." + column);
-			           }
-			        }
-			     } catch (SQLException e) {
-				    System.out.println(e);
-			    } 
-			  }      
-		   }
-		   if (connection.getDebug() == "debug") System.out.println("\t - columnsAs: " + columnsAs + "\naggrColumnsAs: " + aggrColumnsAs);
+			SPARQL = "SELECT ";
 		}
-        int aggrPos = 0;
+		String tmpSparql = "";
+		n = 0;
+		// Add the columns to be projected to the SPARQL string.
+		boolean nonExistentColumns = false;
+
+		LinkedHashMap<String,String> tmpColumnsAs = new LinkedHashMap<String,String>();
+		// If select * ...", replace * in columnsAs with all column names.
+		if(columnsAs.get("*") != null) {
+			if(columnsAs.get("*").equals("*")) {
+				columnsAs.remove("*");
+				String filter = "";
+				if(filters != null) if (filters.size() != 0) filter = filters.get(0);
+				for (String table : tables) {
+					List<String> columns = new ArrayList<String>();
+					try {
+						if(connectionType == "rdf_mode") {
+							columns = sparqlHelper.getSubjects(table + "_" +sparqlHelper.getSchemaString(), "rdfs:domain", ":" + table);
+
+						} else if(connectionType == "ag_sql_rdf_mode") {
+							ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?col rdfs:domain <" + PREFIX + "Person> .\n" +
+									"?s1 ?col ?v . }");
+							for (String tuple : queryResults) {
+								String parts[] = tuple.split(" ")[0].split("#");//JOOJAY: Not a good way to obtain the column names
+								// Add column name to columns if columns does not contain column name and if column name is not
+								// "DBUNIQUEID"
+								if (!columns.contains(parts[parts.length - 1]) && !parts[parts.length - 1].equals("DBUNIQUEID")) {
+									columns.add(parts[parts.length - 1]);
+								}
+							}
+						}
+						for (String column : columns) {
+							if( ! column.equals("DBUNIQUEID")) {
+								columnsAs.put(tables2alias.get(table) + "." + column, "\"" + column + "\"");
+								allCols.add(tables2alias.get(table) + "." + column);
+							}
+						}
+					} catch (SQLException e) {
+						System.out.println(e);
+					}
+				}
+			}
+			if (connection.getDebug() == "debug") System.out.println("\t - columnsAs: " + columnsAs + "\naggrColumnsAs: " + aggrColumnsAs);
+		}
+		int aggrPos = 0;
 		// for (String col: allCols){
 		// 	int groupbySize;
 		// 	n++;
@@ -1054,37 +1168,37 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		//     	}
 		// 		if (n > groupbySize - 1 && n < groupbySize + columnsAs.size())
 		// 			SPARQL += ", ";
-			// }
+		// }
 
 
-        // Prepend all group by columns to optional selects
-        for (int groupbyVar = 0; groupbyVar < groupby.size(); groupbyVar++){
+		// Prepend all group by columns to optional selects
+		for (int groupbyVar = 0; groupbyVar < groupby.size(); groupbyVar++){
             /* 
              * There should be an if block for Oracle RDF and AG
              * Each if block should create the correct SPARQL version for the specified connectionType,
              * similar to lines
         	 */
-            String groupbyCol = allCols.get(groupbyVar);
+			String groupbyCol = allCols.get(groupbyVar);
 			if (tablesAliases.get(groupbyCol.split("\\.")[0]) == null){
 				tmpSparql += "\tOPTIONAL { ?s1" + " :" + groupbyCol.substring(groupbyCol.lastIndexOf(".") + 1) + " ?v" + (groupbyVar + 1) + " }\n";
 				nonExistentColumns = true;
 			}
 			else {
 				tmpSparql += "\tOPTIONAL { ?" + tableSymbols.get(tablesAliases.get(groupbyCol.split("\\.")[0]))
-			              + " :" + groupbyCol.substring(groupbyCol.lastIndexOf(".") + 1) + " ?v" + (groupbyVar + 1) + " }\n";
+						+ " :" + groupbyCol.substring(groupbyCol.lastIndexOf(".") + 1) + " ?v" + (groupbyVar + 1) + " }\n";
 			}
-        }
+		}
 
-        n += groupby.size();
+		n += groupby.size();
 
-        for (String col: columnsAs.keySet()){
+		for (String col: columnsAs.keySet()){
 			n++;
 			if (aggrColumnsAs.keySet().contains(col)){
 				aggrPos++;
 				String v = aggrColumnsAs.get(col).toUpperCase();
 				SPARQL += "n" + aggrPos + " " + v;
 			}
-			else{
+			else {
 				int n2 = n;
 				for (int j = 1; j < allCols.size(); j++){
 					if (allCols.get(j - 1).equals(allCols.get(n-1))){
@@ -1092,14 +1206,14 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 						break;
 					}
 				}
-		    	if(connectionType == "rdf_mode") {
+				if(connectionType == "rdf_mode") {
 					SPARQL += "v" + n2 + " " + columnsAs.get(col);
-	       		}
-			}	    	
-			if (n != allCols.size())
-		    	if(connectionType == "rdf_mode") {
+				}
+			}
+			if (n != columnsAs.size())
+				if(connectionType == "rdf_mode") {
 					SPARQL += ", ";
-	       		}
+				}
 			// Break the col into a key (if it is an aggregate, we must get rid of the function)
 			String key;
 			if (aggrColumnsAs.keySet().contains("?v" + n)){
@@ -1113,15 +1227,15 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 			//               + " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
 			//               // So tmpSparql will be appended with ?s1 :domain ?v1 .
 			// else System.out.println("Column names without aliases are not yet supported. - " + key);
-			
+
 
 			// Create sparql statements in tmpSparql for the columns to be projected, e.g., ?s1 :domain ?v1 . This will be used later.
 			//                                         | This will get the symbol from tableSymbols for the e from e.domain |        | This will get domain from e.domain   |
-            if (tablesAliases.get(key.split("\\.")[0]) == null){
-                if (connectionType == "rdf_mode") {
-                    tmpSparql += "\tOPTIONAL { ?s1" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
-                          + " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
-                } else if (connectionType == "ag_sql_rdf_mode") {
+			if (tablesAliases.get(key.split("\\.")[0]) == null){
+				if (connectionType == "rdf_mode") {
+					tmpSparql += "\tOPTIONAL { ?s1" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
+							+ " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
+				} else if (connectionType == "ag_sql_rdf_mode") {
 
                     /* 
                      * For now, give full URI of predicate instead of :Predicate. This issue must be resolved quickly.
@@ -1129,18 +1243,18 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                      * (E.g. <http://example.org/people.owl#Person) or a prefix before the colon (E.g. a:Person - where
                      * PREFIX a: <http://example.org/people.owl#>). How to resolve the discrepancies?  
                      */
-                    tmpSparql += "\tOPTIONAL { ?s1" + " <" + PREFIX + key.substring(key.lastIndexOf(".") + 1) + "> ?v" + n + " }\n";
-                } else { //representing default case
-                    tmpSparql += "\tOPTIONAL { ?s1" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
-                          + " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
-                }
+					tmpSparql += "\tOPTIONAL { ?s1" + " <" + PREFIX + key.substring(key.lastIndexOf(".") + 1) + "> ?v" + n + " }\n";
+				} else { //representing default case
+					tmpSparql += "\tOPTIONAL { ?s1" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
+							+ " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
+				}
 				nonExistentColumns = true;
 			}
 			else {
 				if (connectionType == "rdf_mode") {
-                    tmpSparql += "\tOPTIONAL { ?" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
-			              + " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
-                } else if (connectionType == "ag_sql_rdf_mode") {
+					tmpSparql += "\tOPTIONAL { ?" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
+							+ " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
+				} else if (connectionType == "ag_sql_rdf_mode") {
 
                     /* 
                      * For now, give full URI of predicate instead of :Predicate. This issue must be resolved quickly.
@@ -1148,20 +1262,20 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                      * (E.g. <http://example.org/people.owl#Person) or a prefix before the colon (E.g. a:Person - where
                      * PREFIX a: <http://example.org/people.owl#>). How to resolve the discrepancies?  
                      */
-                    tmpSparql += "\tOPTIONAL { ?" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
-                          + " <" + PREFIX + key.substring(key.lastIndexOf(".") + 1) + "> ?v" + n + " }\n";
-                } else { //representing default case
-                    tmpSparql += "\tOPTIONAL { ?" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
-                          + " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
-                }
+					tmpSparql += "\tOPTIONAL { ?" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
+							+ " <" + PREFIX + key.substring(key.lastIndexOf(".") + 1) + "> ?v" + n + " }\n";
+				} else { //representing default case
+					tmpSparql += "\tOPTIONAL { ?" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))
+							+ " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
+				}
 			}
-	    }		
+		}
 
 //         for (Map.Entry<String, String> entry : columnsAs.entrySet()) {
 //            // For "select e.domain AS d from ..." ==> key is: e.domain, value is: d
 //            String key = entry.getKey();
 //            String value = entry.getValue();
-           
+
 //            String v = "";
 //            // This if statement should never compute true
 //            if(value.contains(".")) v = "\"" + value.substring(value.lastIndexOf(".") + 1);
@@ -1186,7 +1300,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 // 		       	   if(n == 1) SPARQL += "v" + n + " " + v;
 // 		           else SPARQL += ", v" + n + " " + v;
 // 	       }
-           
+
 //            // Create sparql statements in tmpSparql for the columns to be projected, e.g., ?s1 :domain ?v1 . This will be used later.
 //            //                                         | This will get the symbol from tableSymbols for the e from e.domain |        | This will get domain from e.domain   |
 //            if(key.contains(".")) tmpSparql += "\tOPTIONAL { ?" + tableSymbols.get(tablesAliases.get(key.split("\\.")[0]))              + " :" + key.substring(key.lastIndexOf(".") + 1) + " ?v" + n + " }\n";
@@ -1195,98 +1309,116 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 //            n++;
 // 		}
 
-		// unless as is specified, go with ?n1, ?n2, etc instead of ?v1, ?v2...		
-		if (aggrColumnsAs.keySet().size() == 0 && !nonExistentColumns)
-		    if(connectionType == "rdf_mode") {
-			    SPARQL += "\n FROM TABLE(SEM_MATCH('SELECT * WHERE {\n";
-			} else if(connectionType == "ag_sql_rdf_mode") {
-			    SPARQL += "\nSELECT * WHERE {\n";
-			}
-		else{
-		    if(connectionType == "rdf_mode") {
-			    SPARQL += "\n FROM TABLE(SEM_MATCH('SELECT ";
-			} else if(connectionType == "ag_sql_rdf_mode") {
-			    SPARQL += "\nSELECT";
-			}
-			int x = 1;
-			for (String groupbyVars: groupby)
-				SPARQL += groupbyVars + " ";
-			for (int pull = groupby.size(); pull <= allCols.size(); pull++){
-				if (aggrColumnsAs.keySet().contains("?v" + pull)){
-					SPARQL += "(" + getAggregateSelect(allCols.get(pull - 1).toLowerCase())[0] 
-						   + "(?v" + pull + ")" + " as ?n" + x + ") ";
-					x++;
+		if (!subselect) {
+			// unless as is specified, go with ?n1, ?n2, etc instead of ?v1, ?v2...
+			if (aggrColumnsAs.keySet().size() == 0 && !nonExistentColumns)
+				if(connectionType == "rdf_mode") {
+					SPARQL += "\n FROM TABLE(SEM_MATCH('SELECT * WHERE {\n";
+				} else if(connectionType == "ag_sql_rdf_mode") {
+					SPARQL += "\nSELECT * WHERE {\n";
 				}
 				else{
-					boolean alreadySelected = false;
-		    		for (int j = 1; j <= groupby.size(); j++){
-		    			if (allCols.get(j - 1).equals(allCols.get(pull - 1)) && (j-1 != pull-1)){
-		    				alreadySelected = true;
-		    				break;
-		    			}
-		    		}
-		    		if (!alreadySelected)
-						SPARQL += "?v" + pull + " ";
+					if(connectionType == "rdf_mode") {
+						SPARQL += "\n FROM TABLE(SEM_MATCH('SELECT ";
+					} else if(connectionType == "ag_sql_rdf_mode") {
+						SPARQL += "\nSELECT";
+					}
+					int x = 1;
+					for (String groupbyVars: groupby)
+						SPARQL += groupbyVars + " ";
+					for (int pull = groupby.size(); pull <= allCols.size(); pull++){
+						if (aggrColumnsAs.keySet().contains("?v" + pull)){
+							SPARQL += "(" + getAggregateSelect(allCols.get(pull - 1).toLowerCase())[0]
+									+ "(?v" + pull + ")" + " as ?n" + x + ") ";
+							x++;
+						}
+						else{
+							boolean alreadySelected = false;
+							for (int j = 1; j <= groupby.size(); j++){
+								if (allCols.get(j - 1).equals(allCols.get(pull - 1)) && (j-1 != pull-1)){
+									alreadySelected = true;
+									break;
+								}
+							}
+							if (!alreadySelected)
+								SPARQL += "?v" + pull + " ";
+						}
+					}
+					SPARQL += "WHERE {\n";
+				}
+
+			for (Map.Entry<String, String> entry : tableSymbols.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if (connectionType == "rdf_mode") {
+					SPARQL += "\tGRAPH <" + key + "_" + sparqlHelper.getSchemaString() + "> { ?" + value + " rdf:type :" + key + " }\n";
+				} else if (connectionType == "ag_sql_rdf_mode") {
+					// For now, print out full URI of object instead of :object. This issue must be resolved quickly.
+					SPARQL += "\t?" + value + " rdf:type <" + PREFIX + key + "> .\n";
+				} else { //representing the default case
+					SPARQL += "\t?" + value + " rdf:type :" + key + " .\n";
 				}
 			}
-			SPARQL += "WHERE {\n";	
-		}
-		
-		for (Map.Entry<String, String> entry : tableSymbols.entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if (connectionType == "rdf_mode") {
-                SPARQL += "\tGRAPH <" + key + "_" + sparqlHelper.getSchemaString() + "> { ?" + value + " rdf:type :" + key + " }\n";
-            } else if (connectionType == "ag_sql_rdf_mode") {
-                // For now, print out full URI of object instead of :object. This issue must be resolved quickly.
-                SPARQL += "\t?" + value + " rdf:type <" + PREFIX + key + "> .\n";
-            } else { //representing the default case 
-                SPARQL += "\t?" + value + " rdf:type :" + key + " .\n";
-            }
-        }
-        
-        // Add tmpSparql from above to the SPARQL string.
-        SPARQL += tmpSparql;
-        
-        // Add sparql statements to do joins to the SPARQL string.
-	    n = 1;
-	    for (String s : joinColumns) {
-           // E.g., if s is e.n = d.n
-           //                | This will get the symbol from tableSymbols for the e from e.n      |          | This will get n from e.n |
-	       SPARQL += "\t?" + tableSymbols.get(tablesAliases.get(s.split(" = ")[0].split("\\.")[0])) + " :" + s.split(" = ")[0].split("\\.")[1] + " ?j" + n + " .\n";
-           //                | This will get the symbol from tableSymbols for the d from d.n      |          | This will get n from d.n |
-	       SPARQL += "\t?" + tableSymbols.get(tablesAliases.get(s.split(" = ")[1].split("\\.")[0])) + " :" + s.split(" = ")[1].split("\\.")[1] + " ?j" + n + " .\n";
-	       // So SPARQL will be appended with:     
-	          // ?s1 :n ?j1 .
-	          // ?s2 :n ?j1 .
-           n++;
-	    }
-	    
-	    if(filters != null) if (filters.size() != 0) SPARQL += filters.get(0);
-        
-        n = 0;
-		String orderbyStr = orderby.toString().substring(1 , orderby.toString().length() - 1);
-		String havingStr = having.toString().substring(1 , having.toString().length() - 1);
 
-        SPARQL += "}";
-        if (groupby.size() > 0){
-        	SPARQL += "\nGROUPBY ";
-	        for (String groupbyElem: groupby){
-	        	if (n++ > 0) SPARQL += " ";
-	        	SPARQL += groupbyElem;
-	        }
-        }
-        if (havingStr.length() > 0)	SPARQL += "\n" + havingStr;
-        if (orderbyStr.length() > 0) SPARQL += "\n" + orderbyStr;
-		if(connectionType == "rdf_mode") {
-           SPARQL += "\n" + "' ,\nSEM_MODELS('" + connection.getModel() + "'), null,\nSEM_ALIASES( SEM_ALIAS('', '" + connection.getNamespace() + "')), null) )";
-		} else if(connectionType == "ag_sql_rdf_mode") {
-           SPARQL += "\n";
+			// Add tmpSparql from above to the SPARQL string.
+			SPARQL += tmpSparql;
+
+			// Add sparql statements to do joins to the SPARQL string.
+			n = 1;
+			for (String s : joinColumns) {
+				// E.g., if s is e.n = d.n
+				//                | This will get the symbol from tableSymbols for the e from e.n      |          | This will get n from e.n |
+				SPARQL += "\t?" + tableSymbols.get(tablesAliases.get(s.split(" = ")[0].split("\\.")[0])) + " :" + s.split(" = ")[0].split("\\.")[1] + " ?j" + n + " .\n";
+				//                | This will get the symbol from tableSymbols for the d from d.n      |          | This will get n from d.n |
+				SPARQL += "\t?" + tableSymbols.get(tablesAliases.get(s.split(" = ")[1].split("\\.")[0])) + " :" + s.split(" = ")[1].split("\\.")[1] + " ?j" + n + " .\n";
+				// So SPARQL will be appended with:
+				// ?s1 :n ?j1 .
+				// ?s2 :n ?j1 .
+				n++;
+			}
+
+			if(filters != null) if (filters.size() != 0) SPARQL += filters.get(0);
+
+			n = 0;
+			String orderbyStr = orderby.toString().substring(1 , orderby.toString().length() - 1);
+			String havingStr = having.toString().substring(1 , having.toString().length() - 1);
+
+			SPARQL += "}";
+			if (groupby.size() > 0){
+				SPARQL += "\nGROUPBY ";
+				for (String groupbyElem: groupby){
+					if (n++ > 0) SPARQL += " ";
+					SPARQL += groupbyElem;
+				}
+			}
+			if (havingStr.length() > 0)	SPARQL += "\n" + havingStr;
+			if (orderbyStr.length() > 0) SPARQL += "\n" + orderbyStr;
+			if(connectionType == "rdf_mode") {
+				SPARQL += "\n" + "' ,\nSEM_MODELS('" + connection.getModel() + "'), null,\nSEM_ALIASES( SEM_ALIAS('', '" + connection.getNamespace() + "')), null) )";
+			} else if(connectionType == "ag_sql_rdf_mode") {
+				SPARQL += "\n";
+			}
+		} else {
+			SPARQL += "\n FROM TABLE(SEM_MATCH('";
+			//SPARQL += subselects.get(0).substring(0, subselects.get(0).indexOf("FROM") - 1);
+			SPARQL += subselects.get(0).substring(0, subselects.get(0).indexOf("SELECT") + 6);
+			SPARQL += " " + "?" + subselects.get(0).substring(subselects.get(0).indexOf("1") - 1, subselects.get(0).indexOf("1") + 1);
+			SPARQL += " ?" +  subselects.get(0).substring(subselects.get(0).indexOf("2") - 1, subselects.get(0).indexOf("2") + 1);
+			//SPARQL += " " + "?" + subselects.get(0).substring(subselects.get(0).indexOf("1") + 3, subselects.get(0).indexOf(",") - 1);
+			//SPARQL += " ?" +  subselects.get(0).substring(subselects.get(0).indexOf("2") + 3, subselects.get(0).indexOf("FROM") - 3);
+			SPARQL += "\n " + subselects.get(0).substring(subselects.get(0).indexOf("WHERE"), subselects.get(0).length() - 82);
+			SPARQL += "\nSEM_MODELS('" + connection.getModel() + "'), null,\nSEM_ALIASES( SEM_ALIAS('', '" + connection.getNamespace() + "')), null) )";
 		}
-        if (sq.size() > 0) {
-            subselects.add(SPARQL);
-            subselect = sq.pop();
-        }
+<<<<<<< HEAD
+<<<<<<< HEAD
+		tab = tables;
+		columnsas = columnsAs;
+=======
+>>>>>>> parent of c37b007... Some Changes
+=======
+		tab = tables;
+		columnsas = columnsAs;
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
 		return SPARQL;		
 
 /* Test python statements:
@@ -1369,250 +1501,267 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 >>> 
 
 */
+
 	}
-	
-	private String resolveColumnName(List<String> columnNames,String columnName) {
-	   String tmpColumnName = "";
-	   int cnt = 0;
-	   for (String column : columnNames) {
-		  if(columnName.contains(".")) {
-			  if(columnName.toUpperCase().equals(column.toUpperCase()))
-				 tmpColumnName = column;
-		  }
-		  else {
-			  if(columnName.toUpperCase().equals(column.substring(column.lastIndexOf(".") + 1).toUpperCase()))
-				 tmpColumnName = column;
-		         cnt++;
-		  }
-	   }
-	   if(cnt > 1) {
-		   System.out.println("Column name " + columnName + " is ambiguously defined, using " + tmpColumnName);
-	   }
-	   return tmpColumnName;
+
+	private String resolveColumnName(List<String> columnNames, String columnName) {
+		String tmpColumnName = "";
+		int cnt = 0;
+		for (String column : columnNames) {
+			if(columnName.contains(".")) {
+				if(columnName.toUpperCase().equals(column.toUpperCase()))
+					tmpColumnName = column;
+			}
+			else {
+				if(columnName.toUpperCase().equals(column.substring(column.lastIndexOf(".") + 1).toUpperCase()))
+					tmpColumnName = column;
+				cnt++;
+			}
+		}
+		if(cnt > 1) {
+			System.out.println("Column name " + columnName + " is ambiguously defined, using " + tmpColumnName);
+		}
+		return tmpColumnName;
 	}
 
 	private void p(String s) {
 		System.out.println(s);
 	}
-	private String endOfStmt = "";	
+	private String endOfStmt = "";
 	/* Stack of boolean to indicate weather or not we are
 	 * currently at a subquery
 	 */
 	private Stack<Boolean> sq = new Stack<Boolean>();
-	
+
 	/* Store queries */
 	private Stack<String> subq = new Stack<String>();
-	
+
 	/**
 	 *
 	 */
 	@Override
-	public void visit(SubSelect subSelect) {	
+	public void visit(SubSelect subSelect) {
 		sq.push(true);
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
+		subSelect.getSelectBody().accept(this);
+		System.out.println("Passing through SubSelect\n");
+		subselect = true;
+
+		//temp = subselects.get(0);
+		//temp = temp.substring(0, temp.indexOf("IN") + 2);
+<<<<<<< HEAD
+=======
+        subselect = true;
         //subDepth++;
 		subSelect.getSelectBody().accept(this);
-		//temp = temp.substring(0, temp.indexOf("IN") + 2);
-        PlainSelect subS = (PlainSelect)subSelect.getSelectBody();
-        visit(subS);
+		temp = temp.substring(0, temp.indexOf("IN") + 2);
+        //PlainSelect subS = (PlainSelect)subSelect.getSelectBody();
+        //visit(subS);
+>>>>>>> parent of c37b007... Some Changes
+=======
+>>>>>>> 2a36bfc194400d673c8d22973896e00d97528113
 	}
-	
-	/**
-	*	
-	*/
-	private String getColumns(LinkedHashMap<String,String> columnsAs){
-        //creating columns for ORACLE SQL from regular SQL statement,
-        //current part to create, e.g. SELECT E.A AS CS345, G.B CS370 FROM D AS E, F AS G ...
-        //will result in SELECT A_D CS345, B_F CS370 FROM TABLE( SEM_MATCH('SELECT * WHERE {
-        //note aliases mapping for table names where done while "visiting"
-        
-        String s = "";
-            
-        // If we are returning instances, make sure that we need to return the DBUNIQUEID as part of the select. 
-        if (this.returns_instances_of != null)
-        {
-            for (String return_type : returns_instances_of)
-            {
-                if (columnsAs.get(return_type+".DBUNIQUEID") == null)
-                {
-                    columnsAs.put(return_type+".DBUNIQUEID", return_type+".DBUNIQUEID"); 
-                }
-                
-            }
 
-        }
-        
-        int var = 1;
-        for (String entry : columnsAs.keySet()) {
-            if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, entry: " + entry);
-            if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, colname(entry): " + colname(entry));
-            if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, tablename(entry): " + tablename(entry));
-            if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, columnsAs.get(entry): " + columnsAs.get(entry));
-            if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, colname(columnsAs.get(entry)): " + colname(columnsAs.get(entry)));
-            // So if we are returning instances. We need a way to determine which instance the data belongs too.
-            // To do this i append the tablename_ as part of the column's "as" statement, so the columns returned will start
-            // with the name of the instance for which they belong too. 
-            if (returns_instances_of != null)
-            {
-                // s += colname(entry) + "_" + tablename(entry) + " " + tablename(entry)+"_"+colname(columnsAs.get(entry)) + ", ";
-                s += "v" + var++ + " " + tablename(entry)+"_"+colname(columnsAs.get(entry)) + ", ";
-            }
-            else
-            {
-                // s += colname(entry) + "_" + tablename(entry) + " " + colname(columnsAs.get(entry)) + ", ";
-                s += "v" + var++ + " " + colname(columnsAs.get(entry)) + ", ";
-            }
-        }
-        if(s.length() < 1) return s;
-        s = s.substring(0,s.length()-2);
-        s += " from table(\n\tSEM_MATCH('SELECT * WHERE {\n\t";
-        return s;
+	/**
+	 *
+	 */
+	private String getColumns(LinkedHashMap<String,String> columnsAs){
+		//creating columns for ORACLE SQL from regular SQL statement,
+		//current part to create, e.g. SELECT E.A AS CS345, G.B CS370 FROM D AS E, F AS G ...
+		//will result in SELECT A_D CS345, B_F CS370 FROM TABLE( SEM_MATCH('SELECT * WHERE {
+		//note aliases mapping for table names where done while "visiting"
+
+		String s = "";
+
+		// If we are returning instances, make sure that we need to return the DBUNIQUEID as part of the select.
+		if (this.returns_instances_of != null)
+		{
+			for (String return_type : returns_instances_of)
+			{
+				if (columnsAs.get(return_type+".DBUNIQUEID") == null)
+				{
+					columnsAs.put(return_type+".DBUNIQUEID", return_type+".DBUNIQUEID");
+				}
+
+			}
+
+		}
+
+		int var = 1;
+		for (String entry : columnsAs.keySet()) {
+			if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, entry: " + entry);
+			if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, colname(entry): " + colname(entry));
+			if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, tablename(entry): " + tablename(entry));
+			if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, columnsAs.get(entry): " + columnsAs.get(entry));
+			if (connection.getDebug() == "debug") System.out.println("SQLVisitor-getColumns, colname(columnsAs.get(entry)): " + colname(columnsAs.get(entry)));
+			// So if we are returning instances. We need a way to determine which instance the data belongs too.
+			// To do this i append the tablename_ as part of the column's "as" statement, so the columns returned will start
+			// with the name of the instance for which they belong too.
+			if (returns_instances_of != null)
+			{
+				// s += colname(entry) + "_" + tablename(entry) + " " + tablename(entry)+"_"+colname(columnsAs.get(entry)) + ", ";
+				s += "v" + var++ + " " + tablename(entry)+"_"+colname(columnsAs.get(entry)) + ", ";
+			}
+			else
+			{
+				// s += colname(entry) + "_" + tablename(entry) + " " + colname(columnsAs.get(entry)) + ", ";
+				s += "v" + var++ + " " + colname(columnsAs.get(entry)) + ", ";
+			}
+		}
+		if(s.length() < 1) return s;
+		s = s.substring(0,s.length()-2);
+		s += " from table(\n\tSEM_MATCH('SELECT * WHERE {\n\t";
+		return s;
 	}
-	
+
 	/**
 	 *
 	 */
 	public String getColumnsVar(LinkedHashMap<String,String> columnsAs){
-			//Following example from above SPARQL query will looks like:
-			//	?thisD rdf:type :D .
-			//	?thisD :A ?A_D .
-			//	?thisF rdf:type :F .
-			//	?thisF :B :B_F
-			String s = "";
-			String currTable = "";
-			int var = 1;
-			for (String item : columnsAs.keySet()) {
-				String tableName = tablename(item);
-				String colName = colname(item);
-				String tempTableName = tableName;
-				int minlen = Math.min(tempTableName.length(), 6);
-				if(!tempTableName.equals(currTable)){
-					s += "?" + tempTableName.substring(0, minlen) + " rdf:type :" + tableName + " . \n\t";
-					currTable = tempTableName;
-				}
-				// s += "?" + tempTableName.substring(0, minlen) + " :" + colName + " ?" + colName + "_" + tempTableName + " . \n\t";
-				s += "?" + tempTableName.substring(0, minlen) + " :" + colName + " ?v" + var++ + " . \n\t";
+		//Following example from above SPARQL query will looks like:
+		//	?thisD rdf:type :D .
+		//	?thisD :A ?A_D .
+		//	?thisF rdf:type :F .
+		//	?thisF :B :B_F
+		String s = "";
+		String currTable = "";
+		int var = 1;
+		for (String item : columnsAs.keySet()) {
+			String tableName = tablename(item);
+			String colName = colname(item);
+			String tempTableName = tableName;
+			int minlen = Math.min(tempTableName.length(), 6);
+			if(!tempTableName.equals(currTable)){
+				s += "?" + tempTableName.substring(0, minlen) + " rdf:type :" + tableName + " . \n\t";
+				currTable = tempTableName;
 			}
-			return s;
+			// s += "?" + tempTableName.substring(0, minlen) + " :" + colName + " ?" + colName + "_" + tempTableName + " . \n\t";
+			s += "?" + tempTableName.substring(0, minlen) + " :" + colName + " ?v" + var++ + " . \n\t";
+		}
+		return s;
 	}
-	
+
 	/**
 	 *
 	 */
 	public String getJoins(List<String> matches){
-			//Adding JOINS, e.g.FROM D AS E JOIN F AS G ON E.STUDENID = G.STUDENTID
-			//will result in:	?thisD :STUDENTID ?j1 . ?thisF :STUDENTID ?j1 .
-			String s = "";
-			for(Iterator fI=matches.iterator(); fI.hasNext();) {
-				String item = (String)fI.next();
-				s += item + "\n\t";
-			}
-			return s;
+		//Adding JOINS, e.g.FROM D AS E JOIN F AS G ON E.STUDENID = G.STUDENTID
+		//will result in:	?thisD :STUDENTID ?j1 . ?thisF :STUDENTID ?j1 .
+		String s = "";
+		for(Iterator fI=matches.iterator(); fI.hasNext();) {
+			String item = (String)fI.next();
+			s += item + "\n\t";
+		}
+		return s;
 	}
-	
+
 	/**
 	 *
 	 */
 	public String getFilters(List<String> filters, LinkedHashMap<String, String> columnsAs){
-			// Adding the filters to SEM_MATCH, e.g WHERE D.GRADES > 80
-			//results in: FILTER( GRADES_D > 80)
-			String s = "";
-			if ( !filters.isEmpty() ) {
-				for(Iterator fI=filters.iterator(); fI.hasNext();) {
-					String item = ((String)fI.next()).trim();
-					//String item = "?PETID_PETS = 1001";
-    				String t = item.split("\\s+")[0];
-    				String colName = t.substring(0,t.lastIndexOf("_")).replace("?", "");
-    				String tblName = t.substring(t.lastIndexOf("_") + 1);
-    				int minlen = Math.min(tblName.length(), 6);	
-    				
-					// if(!columnsAs.containsKey(tblName + "." + colName)){      Phil commented this and the other commented line below as a hack to get the where clauses to work
-    						s += "?" + tblName.substring(0, minlen) + " :" + colName + " " + t + " .\n\t";
-					// }
-					
-				}
+		// Adding the filters to SEM_MATCH, e.g WHERE D.GRADES > 80
+		//results in: FILTER( GRADES_D > 80)
+		String s = "";
+		if ( !filters.isEmpty() ) {
+			for(Iterator fI=filters.iterator(); fI.hasNext();) {
+				String item = ((String)fI.next()).trim();
+				//String item = "?PETID_PETS = 1001";
+				String t = item.split("\\s+")[0];
+				String colName = t.substring(0,t.lastIndexOf("_")).replace("?", "");
+				String tblName = t.substring(t.lastIndexOf("_") + 1);
+				int minlen = Math.min(tblName.length(), 6);
 
-				s += "FILTER ( ";
-				for(Iterator fI=filters.iterator(); fI.hasNext();) {
-					String item = ((String)fI.next()).trim();
-					String tblName = getFilterTableName(item);
-					String dataValue = item.substring(item.lastIndexOf(" ") + 1);
-					String tempTV = dataValue;
-					dataValue = dataValue.replaceAll("^\"|\"$", "");
-					
-					//Numeric? needed for special format
-					if(!isNumeric(dataValue)){
-						item = item.replace(tempTV, dataValue);
-						item = item.substring(0, item.lastIndexOf(" ") + 1) + "\"" + item.substring(item.lastIndexOf(" ") + 1) + "\"";
-					}
-					s += item + " ";
-					if (fI.hasNext()) {
-						s += " && ";
-					}
+				// if(!columnsAs.containsKey(tblName + "." + colName)){      Phil commented this and the other commented line below as a hack to get the where clauses to work
+				s += "?" + tblName.substring(0, minlen) + " :" + colName + " " + t + " .\n\t";
+				// }
+
+			}
+
+			s += "FILTER ( ";
+			for(Iterator fI=filters.iterator(); fI.hasNext();) {
+				String item = ((String)fI.next()).trim();
+				String tblName = getFilterTableName(item);
+				String dataValue = item.substring(item.lastIndexOf(" ") + 1);
+				String tempTV = dataValue;
+				dataValue = dataValue.replaceAll("^\"|\"$", "");
+
+				//Numeric? needed for special format
+				if(!isNumeric(dataValue)){
+					item = item.replace(tempTV, dataValue);
+					item = item.substring(0, item.lastIndexOf(" ") + 1) + "\"" + item.substring(item.lastIndexOf(" ") + 1) + "\"";
 				}
-				s += " ) \n\t";
-						}
-			return s;
+				s += item + " ";
+				if (fI.hasNext()) {
+					s += " && ";
+				}
+			}
+			s += " ) \n\t";
+		}
+		return s;
 	}
-	
+
 	/**
 	 *
 	 */
 	public String getEndOfStmt(List<String> internalColumns, List<String> orderby){
-			String s = "";
-			//INTERNAL COLUMNS
-			for (String item : internalColumns) {
-				String tblName = tablename(item);
-				String colName = colname(item);
-    					
-				int minlen = Math.min(tblName.length(), 6);
-				s += "?" + tblName.substring(0, minlen) + " :" + colName + " ?" + colName + "_" + tblName + " . \n\t";
+		String s = "";
+		//INTERNAL COLUMNS
+		for (String item : internalColumns) {
+			String tblName = tablename(item);
+			String colName = colname(item);
+
+			int minlen = Math.min(tblName.length(), 6);
+			s += "?" + tblName.substring(0, minlen) + " :" + colName + " ?" + colName + "_" + tblName + " . \n\t";
+		}
+		//working on progress...
+		s += "}";
+
+		// Adding order by to SEM_MATCH
+		if(orderby.size()>0) {
+			s += "\n\t ORDER BY ";
+			for(Iterator fI=orderby.iterator(); fI.hasNext();) {
+				String item = (String)fI.next();
+				s += item + " ";
 			}
-			//working on progress...
-			s += "}";
-		
-			// Adding order by to SEM_MATCH
-			if(orderby.size()>0) {
-				s += "\n\t ORDER BY ";
-				for(Iterator fI=orderby.iterator(); fI.hasNext();) {
-					String item = (String)fI.next();
-					s += item + " ";
-				}
-			}
-			//Adding model and alias to ORACLE SQL statement
-			s += "',\n\t SEM_MODELS('" + connection.getModel() + "'), ";
-			s += "null,\n\t SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )";
-			return s;
+		}
+		//Adding model and alias to ORACLE SQL statement
+		s += "',\n\t SEM_MODELS('" + connection.getModel() + "'), ";
+		s += "null,\n\t SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )";
+		return s;
 	}
-	
+
 	/**
 	 *
 	 */
-	public void printAllLists(List<String> filters, List<String> tables, List<String> internalColumns, 
-				  List<String> matches, List<String> orderby, LinkedHashMap<String,String> columnsAs){
+	public void printAllLists(List<String> filters, List<String> tables, List<String> internalColumns,
+							  List<String> matches, List<String> orderby, LinkedHashMap<String,String> columnsAs){
 		@SuppressWarnings("unchecked")
 		List<String> colAs = new ArrayList<String>();
-    		for(String s : columnsAs.keySet()){
-    			colAs.add(s); 
-    		}
-		List<List<String>> lists = 
-				  Arrays.asList(filters, tables, colAs, internalColumns, matches, orderby);
-		String[] listsNames = {"Filters:", "Tables:", "Columns:", "Internal Columns:", 
-				       "Matches (or Joins?):", "Order By:"};
+		for(String s : columnsAs.keySet()){
+			colAs.add(s);
+		}
+		List<List<String>> lists =
+				Arrays.asList(filters, tables, colAs, internalColumns, matches, orderby);
+		String[] listsNames = {"Filters:", "Tables:", "Columns:", "Internal Columns:",
+				"Matches (or Joins?):", "Order By:"};
 		for(int i = 0; i < lists.size(); i++){
 			printList(listsNames[i],lists.get(i));
 		}
 	}
-	
+
 	/**
 	 *
 	 */
-	private void printList(String field, List<String> list){ 
+	private void printList(String field, List<String> list){
 		if (connection.getDebug() == "debug") System.out.println(field);
 		if (connection.getDebug() == "debug") for(Iterator fI=list.iterator(); fI.hasNext();) {
 			System.out.println("\t"+fI.next());
 		}
 	}
-	
+
 	/**
 	 *
 	 */
@@ -1621,22 +1770,22 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 			return item.substring(0,item.indexOf('.'));
 		return "tbl";
 	}
-	
+
 	/**
 	 *
 	 */
 	static public String getFilterTableName(String str) {
-        	return (str.substring(0, str.indexOf(" "))).substring(str.indexOf("_") + 1);
-    	}
-	
+		return (str.substring(0, str.indexOf(" "))).substring(str.indexOf("_") + 1);
+	}
+
 	/**
 	 *
 	 */
 	static public String getFilterColumnName(String str) {
-        	return str.substring(1, str.lastIndexOf("_"));
-    	}
-    
-     /**
+		return str.substring(1, str.lastIndexOf("_"));
+	}
+
+	/**
 	 *
 	 */
 	static public String colname(String item) {
@@ -1644,7 +1793,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 			return item.substring(item.indexOf('.')+1);
 		return item;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -1666,7 +1815,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 			join = true;
 			// this is the case of joining two tables
 			// first half of join 
-    					
+
 			int minlen = Math.min(tblName.length(), 6);
 			joinString += "?" + tblName.substring(0, minlen) + " :" + colname(item) + " ?j" + joinInc + " . ";
 			// second half of join
@@ -1696,10 +1845,10 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 		// not invalid syntax; trim the parentheses off
 		aggrCol = aggrCol.substring(aggrCol.indexOf("(") + 1, aggrCol.indexOf(")"));
 		result[1] = aggrCol;
-		
+
 		return result;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -1724,7 +1873,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 		DecimalFormatSymbols currentLocaleSymbols = DecimalFormatSymbols.getInstance();
 		char minusSign = currentLocaleSymbols.getMinusSign();
 
-		if (!Character.isDigit(str.charAt(0)) && str.charAt(0) != minusSign) 
+		if (!Character.isDigit(str.charAt(0)) && str.charAt(0) != minusSign)
 			return false;
 
 		boolean isDecimal = false;
@@ -1741,7 +1890,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 		}
 		return true;
 	}
-	
+
 	/**
 	 *
 	 */
@@ -1753,16 +1902,16 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 		}
 		return null;
 	}
-	
+
 	/**
 	 *
 	 */
 	public void testMethod(String sub) {
 		try {
-			PlainSelect plainSelect2 = (PlainSelect) ((Select) parserManager.parse(new StringReader(sub))).getSelectBody();        	
+			PlainSelect plainSelect2 = (PlainSelect) ((Select) parserManager.parse(new StringReader(sub))).getSelectBody();
 			//System.out.println("Plainselect2 : " + plainSelect2);
 			visit(plainSelect2);
-			}
+		}
 		catch (JSQLParserException e) {
 			System.out.println("Null");
 			//return null;
@@ -1778,7 +1927,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 		temp = tableName.getFullyQualifiedName();
 	}
 	private boolean sub = false;
-	
+
 
 	@Override
 	public void visit(Addition addition) {
@@ -1798,7 +1947,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 			matches.add(temp);
 		} else {
 			//Need tablesAliases	
-			
+
 			String tableName = getFilterTableName(temp.trim());
 			String dataValue = temp.substring(temp.lastIndexOf(" ") + 1);
 			//Right now if is not a numeric value, then it will be consider a string
@@ -1812,7 +1961,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 					return;
 				}
 */
-				
+
 				//Add filter
 				if(tablesAliases.containsKey(tableName))
 					filters.add(temp.replace(tableName, tablesAliases.get(tableName)));
@@ -1832,7 +1981,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 				//validate table name, it does not contain alias.
 				tableName = tablename(colName);
 				//validate column
-					
+
 				//Add filter
 				filters.add(temp.replace("_tbl","_" + tableName));
 			}
@@ -1874,10 +2023,10 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 		equalsTo.getLeftExpression().accept(this);
 		String item = temp;
 		String comparison = "";
-	
+
 		equalsTo.getRightExpression().accept(this);
 		if(equalsTo.getRightExpression() instanceof Column) {
-			join = true; 
+			join = true;
 			temp = match(item, temp, false);
 			wasEquals = true;
 		} else {
@@ -1890,7 +2039,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 	public void visit(Function function) {
 	}
 
-	
+
 	@Override
 	public void visit(GreaterThan greaterThan) {
 		greaterThan.getLeftExpression().accept(this);
@@ -1921,11 +2070,11 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 		temp = filter(item, comparison, value);
 	}
 
-    @Override
-    public void visit(InExpression inExpression) {
-        inExpression.getLeftExpression().accept(this);
-        inExpression.getRightItemsList().accept(this);
-    }
+	@Override
+	public void visit(InExpression inExpression) {
+		inExpression.getLeftExpression().accept(this);
+		inExpression.getRightItemsList().accept(this);
+	}
 
 	//(java/net/sf/jsqlparser/statement/ExpressionDeParser.java)
 	@Override
@@ -1944,7 +2093,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 	public void visit(IntervalExpression iexpr){}
 
 	@Override
-    public void visit(JdbcNamedParameter jdbcNamedParameter){}
+	public void visit(JdbcNamedParameter jdbcNamedParameter){}
 
 	@Override
 	public void visit(OracleHierarchicalExpression oexpr){}
@@ -1954,9 +2103,9 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 
 	@Override
 	public void visit(RegExpMatchOperator rexpr){}
-    
+
 	@Override
-    public void visit(JsonExpression jsonExpr){}
+	public void visit(JsonExpression jsonExpr){}
 
 	@Override
 	public void visit(RegExpMySQLOperator regExpMySQLOperator){}
@@ -2109,12 +2258,12 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 	public void visit(DateValue dateValue) {
 		temp = dateValue.getValue().toString();
 	}
-	
+
 	@Override
 	public void visit(TimestampValue timestampValue) {
 		temp = timestampValue.getValue().toString();
 	}
-	
+
 	@Override
 	public void visit(TimeValue timeValue) {
 		temp = timeValue.getValue().toString();
@@ -2127,23 +2276,23 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 	@Override
 	public void visit(WhenClause whenClause) {
 	}
-	
+
 	@Override
 	public void visit(BitwiseXor bitwiseXor) {
 	}
-	
+
 	@Override
 	public void visit(BitwiseOr bitwiseOr) {
 	}
-	
+
 	@Override
 	public void visit(BitwiseAnd bitwiseAnd) {
 	}
-	
+
 	@Override
 	public void visit(Matches matches) {
 	}
-	
+
 	@Override
 	public void visit(Concat concat) {
 	}
@@ -2163,23 +2312,23 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 		subjoin.getLeft().accept(this);
 		subjoin.getJoin().getRightItem().accept(this);
 	}
-	
+
 	//SELECT ItemS
 	@Override
 	public void visit(AllColumns columns) {
 		temp = "*";
 	}
-	
+
 	@Override
 	public void visit(AllTableColumns columns) {
 		temp = "*";
 	}
-	
+
 	@Override
 	public void visit(SelectExpressionItem item) {
 		item.getExpression().accept(this);
 	}
-	
+
 	//Order by visitor Jesse: Changed this method to work. Check SelectDeParser in src/main/java/net/sf/jsqlparser/util/deparser
 	@Override
 	public void visit(OrderByElement order) {
@@ -2193,10 +2342,10 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 
 	private class ownIllegalSQLException extends IllegalArgumentException
 	{
-	public ownIllegalSQLException( String message )
-	{
-	  super( message );
-	}
+		public ownIllegalSQLException( String message )
+		{
+			super( message );
+		}
 	}
 
 }

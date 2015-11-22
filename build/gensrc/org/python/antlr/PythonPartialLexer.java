@@ -1,4 +1,4 @@
-// $ANTLR 3.1.3 Mar 17, 2009 19:23:44 /media/sf_Work/CS347/project_part_I/MyReL_F15/grammar/PythonPartial.g 2015-11-09 03:23:51
+// $ANTLR 3.1.3 Mar 17, 2009 19:23:44 /media/sf_Work/CS347/project_part_I/MyReL_F15/grammar/PythonPartial.g 2015-10-25 16:38:53
 
 package org.python.antlr;
 
@@ -6364,7 +6364,7 @@ public class PythonPartialLexer extends Lexer {
                         s = -1;
                         if ( ((startPos>0)) ) {s = 131;}
 
-                        else if ( (((startPos==0)||((startPos==0)&&(implicitLineJoiningLevel>0)))) ) {s = 134;}
+                        else if ( ((((startPos==0)&&(implicitLineJoiningLevel>0))||(startPos==0))) ) {s = 134;}
 
                          
                         input.seek(index52_132);
@@ -6379,7 +6379,7 @@ public class PythonPartialLexer extends Lexer {
                         s = -1;
                         if ( ((startPos>0)) ) {s = 131;}
 
-                        else if ( (((startPos==0)||((startPos==0)&&(implicitLineJoiningLevel>0)))) ) {s = 134;}
+                        else if ( ((((startPos==0)&&(implicitLineJoiningLevel>0))||(startPos==0))) ) {s = 134;}
 
                          
                         input.seek(index52_135);

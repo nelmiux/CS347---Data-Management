@@ -85,7 +85,7 @@ public class PyRelConnection extends PyObject {
         connection_type = conn_type; 
         model = user_model.toUpperCase();
         table = user_table.toUpperCase();
-        this.debug = debug;
+        this.debug = "debug";
 System.out.println("________________ mode: " + model);
         
         // For now we create a oracle database connection, but we could create any type of connection.

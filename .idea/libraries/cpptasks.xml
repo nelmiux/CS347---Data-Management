@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="cpptasks">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/dist/javalib/cpptasks/cpptasks.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
