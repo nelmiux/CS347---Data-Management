@@ -96,17 +96,19 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 
 	private List<String> filters;
 	private List<String> matches;
-	private List<String> subselects = new ArrayList<String>();
 	private HashMap<String, String> tablesAliases;
 	private HashMap<String, String> tables2alias;
 	private LinkedHashMap<String, String> columnsAs;
 	private LinkedHashMap<String, String> aggrColumnsAs;
 	private List<String> joinColumns;
+	private List<String> subselects = new ArrayList<String>();
 	private static String temp;
 	private String ownException;
 	private Boolean wasEquals;
 	private Boolean subselect = false;
 	private int subDepth;
+	private List<String> tab = new ArrayList<String>();
+	private LinkedHashMap<String,String> columnsas = new LinkedHashMap<String,String>();
 	private static int joinInc = 1; // for each join this will be incremented and used in a variable name.
 
 	HashMap<String, String> colVarNames = new HashMap<String, String>();
@@ -132,7 +134,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 	 */
 	public SQLVisitor(PyObject conn) {
 		this.connection = (PyRelConnection)conn;
-
 	}
 
 	/**
@@ -415,55 +416,21 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		}
 */
 		SPARQL += subq.pop() + endOfStmt;
-		//Building SPARQL Statement
-		while(!subq.isEmpty()){
-			SPARQL += subq.pop() + endOfStmt + ")";
-		}
+		//if (subselect) subq.pop();
+		//System.out.println("The current query0 in subq is: " + SPARQL);
 
+		//Building SPARQL Statement
+		/*while(!subq.isEmpty()){
+    			SPARQL += subq.pop() + endOfStmt + ")";
+                //System.out.println("The current query1 in subq is: " + SPARQL);
+		}*/
+
+		//System.out.println("Final Reading subq");
 		if (connection.getDebug() == "debug") System.out.println("RDF conversion of select:\n |" + SPARQL + "| END");
 		return SPARQL;
 	}
-
-	public String getSelect(SubSelect select, Collection<String> instance_type_names, String getConnectionType) throws SQLException, JSQLParserException, ownIllegalSQLException{
-		this.returns_instances_of = instance_type_names;
-		// Initialize Validator
-		SQLValidator validator = new SQLValidator();
-		String SPARQL = "";
-		this.connectionType = getConnectionType;
-
-		if (connection.getDebug() == "debug") System.out.println("SQL statement: |" + select + "|");
-		//Setting depth for subqueries, asumming subqueries on the where clause
-		select.getSelectBody().accept(this);
-        
-/*      
-        System.out.println(select.getWithItemsList() + "\n\n");
-        try{
-            if(!ownException.equals("")){
-                throw new ownIllegalSQLException(ownException);
-            }
-        } catch (ownIllegalSQLException e){
-            System.out.println(e);
-            return e.toString();
-        }
-*/
-		SPARQL += subq.pop() + endOfStmt;
-		//Building SPARQL Statement
-		while(!subq.isEmpty()){
-			SPARQL += subq.pop() + endOfStmt + ")";
-		}
-
-		if (connection.getDebug() == "debug") System.out.println("RDF conversion of select:\n |" + SPARQL + "| END");
-		return SPARQL;
-	}
-
 	/* Current subquery */
 	private String tempSub;
-
-    /*public String doSubselect(Select select, Collection<String> instance_type_names, String getConnectionType) throws SQLException, JSQLParserException, ownIllegalSQLException {
-        tempSub = getSelect(select, instance_type_names, getConnectionType);
-        return tempSub;
-    }*/
-
 
 	/**
 	 *
@@ -476,6 +443,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		List<String> orderby = new ArrayList<String>();
 		List<String> groupby = new ArrayList<String>();
 		List<String> having = new ArrayList<String>();
+		//List<String> subselects = new ArrayList<String>();
 		HashMap<String,String> tablesAliases = new HashMap<String,String>();
 		HashMap<String,String> tables2alias = new HashMap<String,String>();
 		LinkedHashMap<String,String> columnsAs = new LinkedHashMap<String,String>();
@@ -483,10 +451,40 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 
 		List<String> joinColumns = new ArrayList<String>();
 
-		tempSub = visitSelect_buildSPARQL(plainSelect, subselects, filters, tables, orderby, groupby, having, tablesAliases, tables2alias, columnsAs, aggrColumnsAs, joinColumns);
+		tempSub = visitSelect_buildSPARQL(plainSelect, filters, tables, orderby, groupby, having, tablesAliases, tables2alias, columnsAs, aggrColumnsAs, joinColumns);
 
 		subq.add(tempSub);
+		subselects.add(tempSub);
+
+		System.out.println("Inside PlainSelect subq: " + subselects.get(0));
 	}
+
+	public ResultSet querySubselect(String ReLstmt) {
+        /*System.out.println("Statemnt: " + ReLstmt);
+        System.out.println();*/
+		// Data structure for result set of SPARQL query
+		ArrayList<String> queryResults = new ArrayList<String>();
+		ResultSet rs = null;
+		try {
+			rs = connection.executeQuery(ReLstmt);
+            /*ResultSetMetaData rsmd = rs.getMetaData();
+            int cc = rsmd.getColumnCount();
+            int dbuniqueid_idx = -1; 
+            for (int i = 1; i <= cc; i++) {
+                queryResults.add(rsmd.getColumnName(i));
+                if(rsmd.getColumnName(i).equals("DBUNIQUEID")) {
+                    dbuniqueid_idx = i - 1; 
+                }
+            }*/
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			System.exit(-1);
+		}
+        /*System.out.println("Inside the Changes: " + queryResults.get(0));
+        System.out.println();*/
+		return rs;
+	}
+
 
 	/**
 	 * Convenience method called by visitSelect_buildSPARQL. Perhaps a better implementation would be to create
@@ -549,7 +547,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 	 */
 	public String visitSelect_buildSPARQL(
 			PlainSelect plainSelect,
-			List<String> subselects,
 			List<String> filters,
 			List<String> tables,
 			List<String> orderby,
@@ -561,6 +558,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 			LinkedHashMap<String, String> aggrColumnsAs,
 			List<String> joinColumns)
 	{
+		if (subselect) tables = tab;
 
 		// Visit the Select statement and build structures necessary to build the SPARQL statement.
 
@@ -587,7 +585,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 			}
 		} else if(connectionType == "ag_sql_rdf_mode") {
 			ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?sub rdfs:domain ?obj . }");
-			//RDFTableNames.add(subselects.get(0));
 			for (String tuple : queryResults) {
 				String parts[] = tuple.split(" ")[0].split("#");//Not a good way to obtain the table names
 				if (!RDFTableNames.contains(parts[parts.length - 1])) {
@@ -611,12 +608,28 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 			if(tableName.toUpperCase().equals(t.toUpperCase()))
 				tmpTableName = t;
 		}
+        /*if (subselect) {
+            try {
+                ResultSet rs = connection.executeQuery(subselects.get(0));
+                ResultSetMetaData rsmd = rs.getMetaData();
+                int cc = rsmd.getColumnCount();
+                for (int i = 1; i <= cc; i++) {
+                    System.out.println(rsmd.getTableName(1));
+                    if (!tables.contains(rsmd.getTableName(i)))
+                        tables.add(rsmd.getTableName(i));
+                }
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                System.exit(-1);
+            }
+        } else {*/
 		if( ! tmpTableName.equals("")) {
 			tables.add(tmpTableName);
 			tablesAliases.put((alias == null ? tmpTableName : alias), tmpTableName);
 			tables2alias.put(tmpTableName, (alias == null ? tmpTableName : alias));
 		}
 		else System.out.println("Table name " + tableName + " does not exist in the RDS data.");
+		//}
 
 		if (plainSelect.getJoins() != null) {
 			for (Iterator joinsIt = plainSelect.getJoins().iterator(); joinsIt.hasNext();) {
@@ -729,7 +742,11 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 
 				// if selecting everything
 				if(temp.equals("*")){
-					columnsAs.put("*", "*");
+					if (subselect) {
+						columnsAs = columnsas;
+					} else {
+						columnsAs.put("*", "*");
+					}
 				}
 				else{
 					// If aggregate (no alias)
@@ -762,7 +779,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 								columnName = tcolName;
 						}
 						columnsAs.put("?v" + pos, "\"" + aliasName.replace("\"", "") + "\"");
-						allCols.add(columnName);
+						if (!allCols.contains(columnName)) allCols.add(columnName);
 					}
 					else { // Non alias, non aggregate
 						columnName = item.toString();
@@ -770,13 +787,29 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 						if ((tcolName = resolveColumnName(columnNames, columnName)) != "")
 							columnName = tcolName;
 						columnsAs.put("?v" + pos, "\"" + columnName.substring(columnName.lastIndexOf(".") + 1) + "\"");
-						allCols.add(columnName);
+						if (!allCols.contains(columnName)) allCols.add(columnName);
+					}
+					if (subselect) {
+						LinkedHashMap<String,String> ta = new LinkedHashMap<String,String>();
+						for (Map.Entry<String, String> entry : columnsAs.entrySet()) {
+							if (columnsas.containsValue(entry.getValue())) {
+								ta.put(entry.getKey(), entry.getValue());
+							}
+						}
+						if (ta.size() > 0) {
+							columnsAs.clear();
+							columnsAs = ta;
+						} else {
+							System.out.println("The columns are not part of the subquery");
+							columnsAs.clear();
+						}
 					}
 				}
 			}
 		}
 
 // End getting column names to project.	
+
 
 // Get join column names.	
 		if (plainSelect.getJoins() != null) {
@@ -829,23 +862,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 							n++;
 						}
 					}
-				}
-				String x = "select";
-				if ((c.indexOf(x) >= 0) || (c.indexOf(x.toUpperCase()) >= 0)) {
-					String ss = "";
-					String nn = "";
-					if (c.indexOf("IN") >= 0) {
-						ss = c.substring(c.indexOf("IN") + 3, c.lastIndexOf(")") + 1);
-						nn = c.substring(0, c.indexOf("IN") - 1);
-					}
-					else if (c.indexOf("in") >= 0) {
-						ss = c.substring(c.indexOf("in") + 3, c.lastIndexOf(")") + 1);
-						nn = c.substring(0, c.indexOf("in") - 1);
-					}
-					System.out.println("This is my test: " + ss);
-					subq.add(ss);
-					filter += ":" + nn + " IN (";
-					subselect = false;
 				}
 			}
 			filters.add(fColumns + filter.replace("'", "") + ") ");
@@ -952,7 +968,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 		if (connection.getDebug() == "debug") {
 			System.out.println("\nvisitSelect_buildSPARQL Structures necessary to build the SPARQL statement:");
 			System.out.println("\t - plainSelect: " + plainSelect);
-			System.out.println("\t - subSelect: " + subselects);
 			System.out.println("\t - RDFTableNames: " + RDFTableNames);
 			System.out.println("\t - tables: " + tables);
 			System.out.println("\t - tablesAliases: " + tablesAliases);
@@ -992,6 +1007,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 					try {
 						if(connectionType == "rdf_mode") {
 							columns = sparqlHelper.getSubjects(table + "_" +sparqlHelper.getSchemaString(), "rdfs:domain", ":" + table);
+
 						} else if(connectionType == "ag_sql_rdf_mode") {
 							ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?col rdfs:domain <" + PREFIX + "Person> .\n" +
 									"?s1 ?col ?v . }");
@@ -1076,7 +1092,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 				String v = aggrColumnsAs.get(col).toUpperCase();
 				SPARQL += "n" + aggrPos + " " + v;
 			}
-			else{
+			else {
 				int n2 = n;
 				for (int j = 1; j < allCols.size(); j++){
 					if (allCols.get(j - 1).equals(allCols.get(n-1))){
@@ -1088,7 +1104,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 					SPARQL += "v" + n2 + " " + columnsAs.get(col);
 				}
 			}
-			if (n != allCols.size())
+			if (n != columnsAs.size())
 				if(connectionType == "rdf_mode") {
 					SPARQL += ", ";
 				}
@@ -1187,99 +1203,108 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
 //            n++;
 // 		}
 
-		// unless as is specified, go with ?n1, ?n2, etc instead of ?v1, ?v2...		
-		if (aggrColumnsAs.keySet().size() == 0 && !nonExistentColumns)
-			if(connectionType == "rdf_mode") {
-				SPARQL += "\n FROM TABLE(SEM_MATCH('SELECT * WHERE {\n";
-			} else if(connectionType == "ag_sql_rdf_mode") {
-				SPARQL += "\nSELECT * WHERE {\n";
-			}
-			else{
+		if (!subselect) {
+			// unless as is specified, go with ?n1, ?n2, etc instead of ?v1, ?v2...
+			if (aggrColumnsAs.keySet().size() == 0 && !nonExistentColumns)
 				if(connectionType == "rdf_mode") {
-					SPARQL += "\n FROM TABLE(SEM_MATCH('SELECT ";
+					SPARQL += "\n FROM TABLE(SEM_MATCH('SELECT * WHERE {\n";
 				} else if(connectionType == "ag_sql_rdf_mode") {
-					SPARQL += "\nSELECT";
+					SPARQL += "\nSELECT * WHERE {\n";
 				}
-				int x = 1;
-				for (String groupbyVars: groupby)
-					SPARQL += groupbyVars + " ";
-				for (int pull = groupby.size(); pull <= allCols.size(); pull++){
-					if (aggrColumnsAs.keySet().contains("?v" + pull)){
-						SPARQL += "(" + getAggregateSelect(allCols.get(pull - 1).toLowerCase())[0]
-								+ "(?v" + pull + ")" + " as ?n" + x + ") ";
-						x++;
+				else{
+					if(connectionType == "rdf_mode") {
+						SPARQL += "\n FROM TABLE(SEM_MATCH('SELECT ";
+					} else if(connectionType == "ag_sql_rdf_mode") {
+						SPARQL += "\nSELECT";
 					}
-					else{
-						boolean alreadySelected = false;
-						for (int j = 1; j <= groupby.size(); j++){
-							if (allCols.get(j - 1).equals(allCols.get(pull - 1)) && (j-1 != pull-1)){
-								alreadySelected = true;
-								break;
-							}
+					int x = 1;
+					for (String groupbyVars: groupby)
+						SPARQL += groupbyVars + " ";
+					for (int pull = groupby.size(); pull <= allCols.size(); pull++){
+						if (aggrColumnsAs.keySet().contains("?v" + pull)){
+							SPARQL += "(" + getAggregateSelect(allCols.get(pull - 1).toLowerCase())[0]
+									+ "(?v" + pull + ")" + " as ?n" + x + ") ";
+							x++;
 						}
-						if (!alreadySelected)
-							SPARQL += "?v" + pull + " ";
+						else{
+							boolean alreadySelected = false;
+							for (int j = 1; j <= groupby.size(); j++){
+								if (allCols.get(j - 1).equals(allCols.get(pull - 1)) && (j-1 != pull-1)){
+									alreadySelected = true;
+									break;
+								}
+							}
+							if (!alreadySelected)
+								SPARQL += "?v" + pull + " ";
+						}
 					}
+					SPARQL += "WHERE {\n";
 				}
-				SPARQL += "WHERE {\n";
+
+			for (Map.Entry<String, String> entry : tableSymbols.entrySet()) {
+				String key = entry.getKey();
+				String value = entry.getValue();
+				if (connectionType == "rdf_mode") {
+					SPARQL += "\tGRAPH <" + key + "_" + sparqlHelper.getSchemaString() + "> { ?" + value + " rdf:type :" + key + " }\n";
+				} else if (connectionType == "ag_sql_rdf_mode") {
+					// For now, print out full URI of object instead of :object. This issue must be resolved quickly.
+					SPARQL += "\t?" + value + " rdf:type <" + PREFIX + key + "> .\n";
+				} else { //representing the default case
+					SPARQL += "\t?" + value + " rdf:type :" + key + " .\n";
+				}
 			}
 
-		for (Map.Entry<String, String> entry : tableSymbols.entrySet()) {
-			String key = entry.getKey();
-			String value = entry.getValue();
-			if (connectionType == "rdf_mode") {
-				SPARQL += "\tGRAPH <" + key + "_" + sparqlHelper.getSchemaString() + "> { ?" + value + " rdf:type :" + key + " }\n";
-			} else if (connectionType == "ag_sql_rdf_mode") {
-				// For now, print out full URI of object instead of :object. This issue must be resolved quickly.
-				SPARQL += "\t?" + value + " rdf:type <" + PREFIX + key + "> .\n";
-			} else { //representing the default case
-				SPARQL += "\t?" + value + " rdf:type :" + key + " .\n";
+			// Add tmpSparql from above to the SPARQL string.
+			SPARQL += tmpSparql;
+
+			// Add sparql statements to do joins to the SPARQL string.
+			n = 1;
+			for (String s : joinColumns) {
+				// E.g., if s is e.n = d.n
+				//                | This will get the symbol from tableSymbols for the e from e.n      |          | This will get n from e.n |
+				SPARQL += "\t?" + tableSymbols.get(tablesAliases.get(s.split(" = ")[0].split("\\.")[0])) + " :" + s.split(" = ")[0].split("\\.")[1] + " ?j" + n + " .\n";
+				//                | This will get the symbol from tableSymbols for the d from d.n      |          | This will get n from d.n |
+				SPARQL += "\t?" + tableSymbols.get(tablesAliases.get(s.split(" = ")[1].split("\\.")[0])) + " :" + s.split(" = ")[1].split("\\.")[1] + " ?j" + n + " .\n";
+				// So SPARQL will be appended with:
+				// ?s1 :n ?j1 .
+				// ?s2 :n ?j1 .
+				n++;
 			}
-		}
 
-		// Add tmpSparql from above to the SPARQL string.
-		SPARQL += tmpSparql;
+			if(filters != null) if (filters.size() != 0) SPARQL += filters.get(0);
 
-		// Add sparql statements to do joins to the SPARQL string.
-		n = 1;
-		for (String s : joinColumns) {
-			// E.g., if s is e.n = d.n
-			//                | This will get the symbol from tableSymbols for the e from e.n      |          | This will get n from e.n |
-			SPARQL += "\t?" + tableSymbols.get(tablesAliases.get(s.split(" = ")[0].split("\\.")[0])) + " :" + s.split(" = ")[0].split("\\.")[1] + " ?j" + n + " .\n";
-			//                | This will get the symbol from tableSymbols for the d from d.n      |          | This will get n from d.n |
-			SPARQL += "\t?" + tableSymbols.get(tablesAliases.get(s.split(" = ")[1].split("\\.")[0])) + " :" + s.split(" = ")[1].split("\\.")[1] + " ?j" + n + " .\n";
-			// So SPARQL will be appended with:
-			// ?s1 :n ?j1 .
-			// ?s2 :n ?j1 .
-			n++;
-		}
+			n = 0;
+			String orderbyStr = orderby.toString().substring(1 , orderby.toString().length() - 1);
+			String havingStr = having.toString().substring(1 , having.toString().length() - 1);
 
-		if(filters != null) if (filters.size() != 0) SPARQL += filters.get(0);
-
-		n = 0;
-		String orderbyStr = orderby.toString().substring(1 , orderby.toString().length() - 1);
-		String havingStr = having.toString().substring(1 , having.toString().length() - 1);
-
-		SPARQL += "}";
-		if (groupby.size() > 0){
-			SPARQL += "\nGROUPBY ";
-			for (String groupbyElem: groupby){
-				if (n++ > 0) SPARQL += " ";
-				SPARQL += groupbyElem;
+			SPARQL += "}";
+			if (groupby.size() > 0){
+				SPARQL += "\nGROUPBY ";
+				for (String groupbyElem: groupby){
+					if (n++ > 0) SPARQL += " ";
+					SPARQL += groupbyElem;
+				}
 			}
+			if (havingStr.length() > 0)	SPARQL += "\n" + havingStr;
+			if (orderbyStr.length() > 0) SPARQL += "\n" + orderbyStr;
+			if(connectionType == "rdf_mode") {
+				SPARQL += "\n" + "' ,\nSEM_MODELS('" + connection.getModel() + "'), null,\nSEM_ALIASES( SEM_ALIAS('', '" + connection.getNamespace() + "')), null) )";
+			} else if(connectionType == "ag_sql_rdf_mode") {
+				SPARQL += "\n";
+			}
+		} else {
+			SPARQL += "\n FROM TABLE(SEM_MATCH('";
+			//SPARQL += subselects.get(0).substring(0, subselects.get(0).indexOf("FROM") - 1);
+			SPARQL += subselects.get(0).substring(0, subselects.get(0).indexOf("SELECT") + 6);
+			SPARQL += " " + "?" + subselects.get(0).substring(subselects.get(0).indexOf("1") - 1, subselects.get(0).indexOf("1") + 1);
+			SPARQL += " ?" +  subselects.get(0).substring(subselects.get(0).indexOf("2") - 1, subselects.get(0).indexOf("2") + 1);
+			//SPARQL += " " + "?" + subselects.get(0).substring(subselects.get(0).indexOf("1") + 3, subselects.get(0).indexOf(",") - 1);
+			//SPARQL += " ?" +  subselects.get(0).substring(subselects.get(0).indexOf("2") + 3, subselects.get(0).indexOf("FROM") - 3);
+			SPARQL += "\n " + subselects.get(0).substring(subselects.get(0).indexOf("WHERE"), subselects.get(0).length() - 82);
+			SPARQL += "\nSEM_MODELS('" + connection.getModel() + "'), null,\nSEM_ALIASES( SEM_ALIAS('', '" + connection.getNamespace() + "')), null) )";
 		}
-		if (havingStr.length() > 0)	SPARQL += "\n" + havingStr;
-		if (orderbyStr.length() > 0) SPARQL += "\n" + orderbyStr;
-		if(connectionType == "rdf_mode") {
-			SPARQL += "\n" + "' ,\nSEM_MODELS('" + connection.getModel() + "'), null,\nSEM_ALIASES( SEM_ALIAS('', '" + connection.getNamespace() + "')), null) )";
-		} else if(connectionType == "ag_sql_rdf_mode") {
-			SPARQL += "\n";
-		}
-		if (sq.size() > 0) {
-			subselects.add(SPARQL);
-			subselect = sq.pop();
-			System.out.println("The obtained subselect is: " + SPARQL);
-		}
+		tab = tables;
+		columnsas = columnsAs;
 		return SPARQL;		
 
 /* Test python statements:
@@ -1362,9 +1387,10 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 >>> 
 
 */
+
 	}
 
-	private String resolveColumnName(List<String> columnNames,String columnName) {
+	private String resolveColumnName(List<String> columnNames, String columnName) {
 		String tmpColumnName = "";
 		int cnt = 0;
 		for (String column : columnNames) {
@@ -1402,11 +1428,12 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
 	@Override
 	public void visit(SubSelect subSelect) {
 		sq.push(true);
-		//subDepth++;
 		subSelect.getSelectBody().accept(this);
+		System.out.println("Passing through SubSelect\n");
+		subselect = true;
+
+		//temp = subselects.get(0);
 		//temp = temp.substring(0, temp.indexOf("IN") + 2);
-		PlainSelect subS = (PlainSelect)subSelect.getSelectBody();
-		visit(subS);
 	}
 
 	/**
