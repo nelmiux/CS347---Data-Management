@@ -21,14 +21,14 @@ dist/bin/jython
 ```
 
 ## How it works?
-```
-- After the SQL query is submitted, it is evaluated and sent to the SQL Server hosting the database
-- In PyTuple.doRDF: if (statement instanceof Select), call SQLVisitor.getSelect
-- In SQLVisitor.getSelect, somehow gets to visit, which calls visitSelect_buildSPARQL
-- visitSelect_buildSPARQL returns the SPARQL statement to SQLVisitor.getSelect with the help of jsqlparser that convert SQL statements grammar to SPARQL grammar ( we don't need to write code to check for key words or parse the statement. That work is done by the jsqlparser)
-- SQLVisitor.getSelect returns the SPARQL to PyTuple
-- PyTuple.doRDF then calls runAndOutputTuples, which calls conn.executeQuery(ReLstmt) and the results from this are processed and stored in the results field of PyTuple
-```
+
+--- After the SQL query is submitted, it is evaluated and sent to the SQL Server hosting the database
+--- In PyTuple.doRDF: if (statement instanceof Select), call SQLVisitor.getSelect
+--- In SQLVisitor.getSelect, somehow gets to visit, which calls visitSelect_buildSPARQL
+--- visitSelect_buildSPARQL returns the SPARQL statement to SQLVisitor.getSelect with the help of jsqlparser that convert SQL statements grammar to SPARQL grammar ( we don't need to write code to check for key words or parse the statement. That work is done by the jsqlparser)
+--- SQLVisitor.getSelect returns the SPARQL to PyTuple
+--- PyTuple.doRDF then calls runAndOutputTuples, which calls conn.executeQuery(ReLstmt) and the results from this are processed and stored in the results field of PyTuple
+
 
 ###Example without subqueries:
 ```
