@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="servlet">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/dist/javalib/mockrunner-0.4.1/jar/j2ee1.3/servlet.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>

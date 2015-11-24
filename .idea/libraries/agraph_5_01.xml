@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="agraph-5.01">
-    <CLASSES>
-      <root url="jar://$PROJECT_DIR$/Lib/agraph-5.0.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
