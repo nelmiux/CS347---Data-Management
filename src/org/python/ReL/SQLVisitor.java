@@ -106,7 +106,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
     private String ownException;
     private Boolean wasEquals;
     private Boolean subselect = false;
-    private Boolean beforesub = false;
     private Boolean subWhere = false;
     private int subDepth;
     private List<String> tab = new ArrayList<String>();
@@ -445,7 +444,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
         List<String> orderby = new ArrayList<String>();
         List<String> groupby = new ArrayList<String>();
         List<String> having = new ArrayList<String>();
-        //List<String> subselects = new ArrayList<String>();
         HashMap<String,String> tablesAliases = new HashMap<String,String>();
         HashMap<String,String> tables2alias = new HashMap<String,String>();
         LinkedHashMap<String,String> columnsAs = new LinkedHashMap<String,String>();
@@ -630,7 +628,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
             tablesAliases.put((alias == null ? tmpTableName : alias), tmpTableName);
             tables2alias.put(tmpTableName, (alias == null ? tmpTableName : alias));
         }
-        else System.out.println("Table name " + tableName + " does not exist in the RDS data.");
+        //else System.out.println("Table name " + tableName + " does not exist in the RDS data.");
         //}
 
         if (plainSelect.getJoins() != null) {
@@ -651,7 +649,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                     tablesAliases.put( (alias == null ? tmpTableName : alias), tmpTableName);
                     tables2alias.put(tmpTableName, (alias == null ? tmpTableName : alias));
                 }
-                else System.out.println("Table name " + tableName + " does not exist in the RDS data.");
+                //else System.out.println("Table name " + tableName + " does not exist in the RDS data.");
             }
         }
 // End getting table names and their aliases if any.
@@ -729,7 +727,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                 i++;
             }
         }
-
+        boolean b = false;
 // Get column names to project.
         if(plainSelect.getSelectItems() != null) {
             //gets the columns that are asked of
@@ -743,30 +741,8 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                 int pos = allCols.size() + 1;
 
                 // if selecting everything
-                if ((temp.equals("*")) && (!subselect)) {
-                    /*LinkedHashMap<String,String> ta = new LinkedHashMap<String,String>();
-                    if (beforesub) {
-                        int p = 1;
-                        for (String s: columnNames) {
-                            String key = "?v" + p;
-                            String vname = columnNames.get(p - 1);
-                            String value = "\"" + vname.substring(vname.indexOf(".") + 1) + "\"";
-                            ta.put(key, value);
-                            allCols.add(vname);
-                            ++p;
-                        }
-                        if (ta.size() > 0)
-                            columnsAs = ta;
-                    } else {*/
-                    allCols.clear();
-                    int p = 1;
-                    for (String s: columnNames) {
-                        String vname = columnNames.get(p - 1);
-                        allCols.add(vname);
-                        ++p;
-                    }
+                if (temp.equals("*") && !subselect) {
                     columnsAs.put("*", "*");
-                    //}
                 }
                 else{
                     // If aggregate (no alias)
@@ -811,22 +787,30 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                     }
                 }
                 if (subselect) {
-                    LinkedHashMap<String,String> ta = new LinkedHashMap<String,String>();
-                    if(columnsAs.get("*") != null) {
-                        columnsAs = columnsas;
-                        tables = tab;
-                    } else {
-                        for (Map.Entry<String, String> entry: columnsas.entrySet()) {
-                            if (columnsAs.containsValue(entry.getValue())) {
-                                ta.put(entry.getKey(), entry.getValue());
-                                System.out.println("The Key is: " + entry.getKey() + " " + entry.getValue());
-                            }
+                    for (Map.Entry<String, String> entry: columnsAs.entrySet()) {
+                        //System.out.println("The Key is: " + entry.getKey() + " " + entry.getValue());
+                        if (columnsAs.containsValue("\"*\"")) {
+                            //System.out.println("The Key1 is: " + entry.getKey() + " " + entry.getValue());
+                            b = true;
+                            columnsAs.clear();
+                            columnsAs = columnsas;
+                            break;
                         }
+                    }
+                    LinkedHashMap<String,String> ta = new LinkedHashMap<String,String>();
+                    for (Map.Entry<String, String> entry: columnsas.entrySet()) {
+                        if (columnsAs.containsValue(entry.getValue())) {
+                            ta.put(entry.getKey(), entry.getValue());
+                            //System.out.println("The Key is: " + entry.getKey() + " " + entry.getValue());
+                        }
+                    }
+                    if (!b) {
                         if (ta.size() > 0) {
                             columnsAs.clear();
                             columnsAs = ta;
                         } else {
                             System.out.println("The columns are not part of the subquery");
+                            columnsAs.clear();
                         }
                     }
                 }
@@ -864,10 +848,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
             String fColumns = "";
             String filter = "\tFILTER(";
             n = 1;
-            int subflag=0;
-            String innerSubquery="";
-
-
+            String innerSubquery = "";
             for (String c : whereClauses) {
                 for (String ineq : inequalities) {
                     if (c.contains(ineq)) {
@@ -890,35 +871,34 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                             filter += "?f" + n;
                             n++;
                         }
+                        String x = "select";
+                        if (!subselect) {
+                            if ((c.indexOf(x) >= 0) || (c.indexOf(x.toUpperCase()) >= 0)) {
+                                try {
+                                    String subsq = c.substring(c.indexOf("(") + 1, c.indexOf(")"));
+                                    PlainSelect plainSelect2 = (PlainSelect) ((Select) parserManager.parse(new StringReader(subsq))).getSelectBody();
 
-                        try {
-                            String subselect = c.substring(c.indexOf("(")+1,c.indexOf(")"));
-                            PlainSelect plainSelect2 = (PlainSelect) ((Select) parserManager.parse(new StringReader(subselect))).getSelectBody();
-                            System.out.println("Plainselect2 : " + plainSelect2);
-                            visit(plainSelect2);
+                                    visit(plainSelect2);
 
-                            for(String i : subq){
-                                System.out.println(">>>>>>>>>>>>>>>>>>" + i);
+                                    innerSubquery = subq.pop();
+                                    String temp[] = innerSubquery.split("SEM_MATCH");
+                                    if(temp.length > 1)
+                                        temp = temp[1].split("'");
+                                    if(temp.length > 2)
+                                        innerSubquery = temp[1];
+                                    innerSubquery="\t{ "+innerSubquery+"\t} ";
+                                    subWhere = true;
+                                }catch(Exception e){
+                                    System.out.println("We exploded " + e.getMessage());
+                                }
                             }
-
-                            innerSubquery = subq.pop();
-                            String temp[] = innerSubquery.split("SEM_MATCH");
-                            if(temp.length > 1)
-                                temp = temp[1].split("'");
-                            if(temp.length > 2)
-                                innerSubquery = temp[1];
-                            innerSubquery="\n{"+innerSubquery+"}";
-                            subWhere = true;
-                        }catch(Exception e){
-                            System.out.println("We exploded " + e.getMessage());
                         }
                     }
                 }
             }
-
-            if(subWhere) {
+            if (subWhere) {
                 filters.add(innerSubquery);
-            }else{
+            } else {
                 filters.add(fColumns + filter.replace("'", "") + ") ");
             }
         }
@@ -1020,7 +1000,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
             having.add(str + ")");
         }
 
-
         if (connection.getDebug() == "debug") {
             System.out.println("\nvisitSelect_buildSPARQL Structures necessary to build the SPARQL statement:");
             System.out.println("\t - plainSelect: " + plainSelect);
@@ -1063,6 +1042,7 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                     try {
                         if(connectionType == "rdf_mode") {
                             columns = sparqlHelper.getSubjects(table + "_" +sparqlHelper.getSchemaString(), "rdfs:domain", ":" + table);
+
                         } else if(connectionType == "ag_sql_rdf_mode") {
                             ArrayList<String> queryResults = queryAG("SELECT * WHERE { ?col rdfs:domain <" + PREFIX + "Person> .\n" +
                                     "?s1 ?col ?v . }");
@@ -1075,21 +1055,21 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
                                 }
                             }
                         }
-                        columnsAs.clear();
-                        int p = 1;
-                        for (String column: columnNames) {
-                            String key = "?v" + p;
-                            String vname = columnNames.get(p - 1);
-                            String value = "\"" + vname.substring(vname.indexOf(".") + 1) + "\"";
-                            columnsAs.put(key, "\"" + vname.substring(vname.indexOf(".") + 1) + "\"");
-                            ++p;
+                        for (String column : columns) {
+                            if( ! column.equals("DBUNIQUEID")) {
+                                columnsAs.put(tables2alias.get(table) + "." + column, "\"" + column + "\"");
+                                allCols.add(tables2alias.get(table) + "." + column);
+                            }
                         }
-			        /*for (String column : columns) {
-                       if( ! column.equals("DBUNIQUEID")) {
-						   columnsAs.put(tables2alias.get(table) + "." + column, "\"" + column + "\"");
-						   allCols.add(tables2alias.get(table) + "." + column);
-			           }
-			        }*/
+                        if (sq.pop()) {
+                            int p = 1;
+                            for (Map.Entry<String, String> entry: columnsAs.entrySet()) {
+                                tmpColumnsAs.put("?v" + p, entry.getValue());
+                                ++p;
+                            }
+                            columnsAs.clear();
+                            columnsAs = tmpColumnsAs;
+                        }
                     } catch (SQLException e) {
                         System.out.println(e);
                     }
@@ -1150,7 +1130,6 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
         n += groupby.size();
 
         for (String col: columnsAs.keySet()){
-            System.out.println ("The Key at the end is: " + columnsAs.get(col));
             n++;
             if (aggrColumnsAs.keySet().contains(col)){
                 aggrPos++;
@@ -1368,15 +1347,12 @@ public class SQLVisitor extends SelectDeParser implements SelectVisitor, FromIte
             if (!subWhere) {
                 SPARQL += "\n FROM TABLE(SEM_MATCH('";
                 SPARQL += subselects.get(0).substring(0, subselects.get(0).indexOf("SELECT") + 6);
-                int i = 1;
                 for (Map.Entry<String, String> entry : columnsas.entrySet()) {
                     String key = entry.getKey();
                     SPARQL += " " + key;
                 }
                 SPARQL += "\n " + subselects.get(0).substring(subselects.get(0).indexOf("WHERE"), subselects.get(0).length());
-            }
-            if (subWhere && subselects.size()>0){
-
+                b = false;
             }
         }
         tab = tables;
@@ -1481,7 +1457,7 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
             }
         }
         if(cnt > 1) {
-            System.out.println("Column name " + columnName + " is ambiguously defined, using " + tmpColumnName);
+            //System.out.println("Column name " + columnName + " is ambiguously defined, using " + tmpColumnName);
         }
         return tmpColumnName;
     }
@@ -1504,11 +1480,10 @@ SEM_ALIASES( SEM_ALIAS('', 'http://www.example.org/people.owl#')), null) )| END
     @Override
     public void visit(SubSelect subSelect) {
         sq.push(true);
-        beforesub = true;
         subSelect.getSelectBody().accept(this);
-        System.out.println("Passing through SubSelect\n");
-        beforesub = false;
+        //System.out.println("Passing through SubSelect\n");
         subselect = true;
+
         //temp = subselects.get(0);
         //temp = temp.substring(0, temp.indexOf("IN") + 2);
     }
