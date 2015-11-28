@@ -75,7 +75,7 @@ SPARQL: SELECT v1 "empno", v8 "sal"
         	  OPTIONAL { ?s1 :dept ?v9 }
         }
         
-  #### Subquery in FROM with * on left
+#### Subquery in FROM with * on left
   
   SQL: select * from (select empno, sal, deptno from emp);
   
