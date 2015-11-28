@@ -19,7 +19,7 @@
 * Now open SQL Developer and you should see a table named "E5_C##cs347_UTEID"
 * Now you can run the SparQL queries.  
 
-### Implement the conversion of SQL subqueries to SPARQL subqueries in ReL (ReL Source Code).
+### Implement the conversion of SQL subqueries to SPARQL subqueries in ReL
 
 * FROM
 * WHERE
